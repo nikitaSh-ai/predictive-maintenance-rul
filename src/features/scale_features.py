@@ -32,7 +32,7 @@ def scale_features():
         "engine_id",
         "cycle",
         "max_cycle",
-        "RUL"
+        "RUL","RUL_CLIPPED"
     ]
 
     feature_cols = [

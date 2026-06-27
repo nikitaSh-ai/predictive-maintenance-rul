@@ -35,6 +35,16 @@ def build_datasets():
     # -----------------------
     df = generate_rul(df)
 
+
+    # -----------------------
+    # Clip RUL
+    # -----------------------
+    RUL_MAX = 125
+
+    df["RUL_CLIPPED"] = df["RUL"].clip(upper=RUL_MAX)
+
+    print(f"RUL clipped to maximum value of {RUL_MAX}.")
+
     # -----------------------
     # Load engine split
     # -----------------------
