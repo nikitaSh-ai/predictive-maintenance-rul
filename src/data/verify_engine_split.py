@@ -1,41 +1,65 @@
 # If even one engine appears in both training and testing: Random Forest becomes optimistic, XGBoost becomes optimistic. GRU becomes optimistic. SHAP explanations become misleading. The evaluation is no longer trustworthy.
 
 
+"""
+verify_engine_split.py
+
+Purpose:
+Verify that the engine-level Train/Validation/Test split
+contains no overlapping engine IDs.
+"""
+
 import json
 
 
-with open("DATA/processed/engine_split.json", "r") as f:
-    split = json.load(f)
+def verify_engine_split():
+    """
+    Verify engine split integrity.
+    """
 
-train = set(split["train"])
-validation = set(split["validation"])
-test = set(split["test"])
+    with open("DATA/processed/engine_split.json", "r") as f:
+        split = json.load(f)
 
-print("=" * 50)
-print("ENGINE SPLIT VERIFICATION")
-print("=" * 50)
+    train = set(split["train"])
+    validation = set(split["validation"])
+    test = set(split["test"])
 
-print("\nTrain Engines:", len(train))
-print("Validation Engines:", len(validation))
-print("Test Engines:", len(test))
+    print("=" * 50)
+    print("ENGINE SPLIT VERIFICATION")
+    print("=" * 50)
 
-print("\nOverlap Checks")
+    print("\nTrain Engines:", len(train))
+    print("Validation Engines:", len(validation))
+    print("Test Engines:", len(test))
 
-print(
-    "Train ∩ Validation:",
-    len(train.intersection(validation))
-)
+    print("\nOverlap Checks")
 
-print(
-    "Train ∩ Test:",
-    len(train.intersection(test))
-)
+    print(
+        "Train ∩ Validation:",
+        len(train.intersection(validation))
+    )
 
-print(
-    "Validation ∩ Test:",
-    len(validation.intersection(test))
-)
+    print(
+        "Train ∩ Test:",
+        len(train.intersection(test))
+    )
 
-all_engines = train.union(validation).union(test)
+    print(
+        "Validation ∩ Test:",
+        len(validation.intersection(test))
+    )
 
-print("\nTotal Unique Engines:", len(all_engines))
+    all_engines = train.union(validation).union(test)
+
+    print("\nTotal Unique Engines:", len(all_engines))
+
+
+def main():
+    """
+    Run engine split verification.
+    """
+    verify_engine_split()
+
+
+if __name__ == "__main__":
+    main()

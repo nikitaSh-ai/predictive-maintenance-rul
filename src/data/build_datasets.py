@@ -5,6 +5,14 @@
 
 
 
+"""
+build_datasets.py
+
+Purpose:
+Build Train, Validation, and Test datasets
+using the engine-level split.
+"""
+
 import os
 import json
 
@@ -12,47 +20,63 @@ from src.data.data_loader import load_data
 from src.data.rul_generator import generate_rul
 
 
-# -----------------------
-# Load raw dataset
-# -----------------------
-df = load_data("DATA/raw/train_FD001.txt")
+def build_datasets():
+    """
+    Build train, validation, and test datasets.
+    """
 
-# -----------------------
-# Generate RUL
-# -----------------------
-df = generate_rul(df)
+    # -----------------------
+    # Load raw dataset
+    # -----------------------
+    df = load_data("DATA/raw/train_FD001.txt")
 
-# -----------------------
-# Load engine split
-# -----------------------
-with open("DATA/processed/engine_split.json", "r") as f:
-    split = json.load(f)
+    # -----------------------
+    # Generate RUL
+    # -----------------------
+    df = generate_rul(df)
 
-train_engines = set(split["train"])
-validation_engines = set(split["validation"])
-test_engines = set(split["test"])
+    # -----------------------
+    # Load engine split
+    # -----------------------
+    with open("DATA/processed/engine_split.json", "r") as f:
+        split = json.load(f)
 
-# -----------------------
-# Create datasets
-# -----------------------
-train_df = df[df["engine_id"].isin(train_engines)].copy()
+    train_engines = set(split["train"])
+    validation_engines = set(split["validation"])
+    test_engines = set(split["test"])
 
-validation_df = df[df["engine_id"].isin(validation_engines)].copy()
+    # -----------------------
+    # Create datasets
+    # -----------------------
+    train_df = df[df["engine_id"].isin(train_engines)].copy()
 
-test_df = df[df["engine_id"].isin(test_engines)].copy()
+    validation_df = df[df["engine_id"].isin(validation_engines)].copy()
 
-# -----------------------
-# Save datasets
-# -----------------------
-os.makedirs("DATA/processed", exist_ok=True)
+    test_df = df[df["engine_id"].isin(test_engines)].copy()
 
-train_df.to_csv("DATA/processed/train.csv", index=False)
-validation_df.to_csv("DATA/processed/validation.csv", index=False)
-test_df.to_csv("DATA/processed/test.csv", index=False)
+    # -----------------------
+    # Save datasets
+    # -----------------------
+    os.makedirs("DATA/processed", exist_ok=True)
 
-# -----------------------
-# Verification
-# -----------------------
-print("Train shape:", train_df.shape)
-print("Validation shape:", validation_df.shape)
-print("Test shape:", test_df.shape)
+    train_df.to_csv("DATA/processed/train.csv", index=False)
+    validation_df.to_csv("DATA/processed/validation.csv", index=False)
+    test_df.to_csv("DATA/processed/test.csv", index=False)
+
+    # -----------------------
+    # Verification
+    # -----------------------
+    print("Train shape:", train_df.shape)
+    print("Validation shape:", validation_df.shape)
+    print("Test shape:", test_df.shape)
+
+
+def main():
+    """
+    Run dataset creation pipeline.
+    """
+    build_datasets()
+
+
+if __name__ == "__main__":
+    main()

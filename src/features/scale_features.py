@@ -11,84 +11,102 @@ import joblib
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-# -----------------------
-# Load datasets
-# -----------------------
-train_df = pd.read_csv("DATA/processed/train_selected.csv")
-validation_df = pd.read_csv("DATA/processed/validation_selected.csv")
-test_df = pd.read_csv("DATA/processed/test_selected.csv")
 
-# -----------------------
-# Columns not to scale
-# -----------------------
-exclude_cols = [
-    "engine_id",
-    "cycle",
-    "max_cycle",
-    "RUL"
-]
+def scale_features():
+    """
+    Scale numerical features using the training dataset
+    and save the scaler and scaled datasets.
+    """
 
-feature_cols = [
-    col for col in train_df.columns
-    if col not in exclude_cols
-]
+    # -----------------------
+    # Load datasets
+    # -----------------------
+    train_df = pd.read_csv("DATA/processed/train_selected.csv")
+    validation_df = pd.read_csv("DATA/processed/validation_selected.csv")
+    test_df = pd.read_csv("DATA/processed/test_selected.csv")
 
-print("=" * 60)
-print("FEATURE SCALING")
-print("=" * 60)
+    # -----------------------
+    # Columns not to scale
+    # -----------------------
+    exclude_cols = [
+        "engine_id",
+        "cycle",
+        "max_cycle",
+        "RUL"
+    ]
 
-print("\nNumber of Features:", len(feature_cols))
+    feature_cols = [
+        col for col in train_df.columns
+        if col not in exclude_cols
+    ]
 
-# -----------------------
-# Fit scaler on train only
-# -----------------------
-scaler = StandardScaler()
+    print("=" * 60)
+    print("FEATURE SCALING")
+    print("=" * 60)
 
-train_df[feature_cols] = scaler.fit_transform(
-    train_df[feature_cols]
-)
+    print("\nNumber of Features:", len(feature_cols))
 
-validation_df[feature_cols] = scaler.transform(
-    validation_df[feature_cols]
-)
+    # -----------------------
+    # Fit scaler on train only
+    # -----------------------
+    scaler = StandardScaler()
 
-test_df[feature_cols] = scaler.transform(
-    test_df[feature_cols]
-)
+    train_df[feature_cols] = scaler.fit_transform(
+        train_df[feature_cols]
+    )
 
-# -----------------------
-# Save scaler
-# -----------------------
-os.makedirs("DATA/processed", exist_ok=True)
+    validation_df[feature_cols] = scaler.transform(
+        validation_df[feature_cols]
+    )
 
-joblib.dump(
-    scaler,
-    "DATA/processed/scaler.pkl"
-)
+    test_df[feature_cols] = scaler.transform(
+        test_df[feature_cols]
+    )
 
-# -----------------------
-# Save scaled datasets
-# -----------------------
-train_df.to_csv(
-    "DATA/processed/train_scaled.csv",
-    index=False
-)
+    # -----------------------
+    # Save scaler
+    # -----------------------
+    os.makedirs("DATA/processed", exist_ok=True)
 
-validation_df.to_csv(
-    "DATA/processed/validation_scaled.csv",
-    index=False
-)
+    joblib.dump(
+        scaler,
+        "DATA/processed/scaler.pkl"
+    )
 
-test_df.to_csv(
-    "DATA/processed/test_scaled.csv",
-    index=False
-)
+    # -----------------------
+    # Save scaled datasets
+    # -----------------------
+    train_df.to_csv(
+        "DATA/processed/train_scaled.csv",
+        index=False
+    )
 
-print("\nScaling Complete.")
+    validation_df.to_csv(
+        "DATA/processed/validation_scaled.csv",
+        index=False
+    )
 
-print("\nTrain Shape:", train_df.shape)
-print("Validation Shape:", validation_df.shape)
-print("Test Shape:", test_df.shape)
+    test_df.to_csv(
+        "DATA/processed/test_scaled.csv",
+        index=False
+    )
 
-print("\nScaler saved to:")
-print("DATA/processed/scaler.pkl")
+    print("\nScaling Complete.")
+
+    print("\nTrain Shape:", train_df.shape)
+    print("Validation Shape:", validation_df.shape)
+    print("Test Shape:", test_df.shape)
+
+    print("\nScaler saved to:")
+    print("DATA/processed/scaler.pkl")
+
+
+def main():
+    """
+    Run feature scaling.
+    """
+    scale_features()
+
+
+if __name__ == "__main__":
+    main()

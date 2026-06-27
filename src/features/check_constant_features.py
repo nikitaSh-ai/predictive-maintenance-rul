@@ -10,56 +10,74 @@ These features carry no information and will be removed before model training.
 
 import pandas as pd
 
-# -----------------------
-# Load training dataset
-# -----------------------
-train_df = pd.read_csv("DATA/processed/train.csv")
 
-print("=" * 60)
-print("CONSTANT FEATURE ANALYSIS")
-print("=" * 60)
+def check_constant_features():
+    """
+    Identify constant features and save them for
+    feature selection.
+    """
 
-# Columns that are NOT sensor/features
-exclude_cols = [
-    "engine_id",
-    "cycle",
-    "RUL",
-    "max_cycle"
-]
+    # -----------------------
+    # Load training dataset
+    # -----------------------
+    train_df = pd.read_csv("DATA/processed/train.csv")
 
-feature_cols = [
-    col for col in train_df.columns
-    if col not in exclude_cols
-]
+    print("=" * 60)
+    print("CONSTANT FEATURE ANALYSIS")
+    print("=" * 60)
 
-constant_features = []
+    # Columns that are NOT sensor/features
+    exclude_cols = [
+        "engine_id",
+        "cycle",
+        "RUL",
+        "max_cycle"
+    ]
 
-print("\nChecking feature variability...\n")
+    feature_cols = [
+        col for col in train_df.columns
+        if col not in exclude_cols
+    ]
 
-for feature in feature_cols:
+    constant_features = []
 
-    unique_values = train_df[feature].nunique()
+    print("\nChecking feature variability...\n")
 
-    print(f"{feature:<15} Unique Values: {unique_values}")
+    for feature in feature_cols:
 
-    if unique_values == 1:
-        constant_features.append(feature)
+        unique_values = train_df[feature].nunique()
 
-print("\n" + "=" * 60)
+        print(f"{feature:<15} Unique Values: {unique_values}")
 
-print("Constant Features Found:")
+        if unique_values == 1:
+            constant_features.append(feature)
 
-for feature in constant_features:
-    print(feature)
+    print("\n" + "=" * 60)
 
-print("\nTotal Constant Features:", len(constant_features))
+    print("Constant Features Found:")
 
-# -----------------------
-# Save list for later use
-# -----------------------
-with open("DATA/processed/constant_features.txt", "w") as f:
     for feature in constant_features:
-        f.write(feature + "\n")
+        print(feature)
 
-print("\nSaved to:")
-print("DATA/processed/constant_features.txt")
+    print("\nTotal Constant Features:", len(constant_features))
+
+    # -----------------------
+    # Save list
+    # -----------------------
+    with open("DATA/processed/constant_features.txt", "w") as f:
+        for feature in constant_features:
+            f.write(feature + "\n")
+
+    print("\nSaved to:")
+    print("DATA/processed/constant_features.txt")
+
+
+def main():
+    """
+    Run constant feature analysis.
+    """
+    check_constant_features()
+
+
+if __name__ == "__main__":
+    main()

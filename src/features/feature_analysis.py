@@ -1,20 +1,45 @@
+"""
+feature_analysis.py
+
+Purpose:
+Perform basic exploratory analysis of the
+training dataset.
+"""
+
 import pandas as pd
 
-# Load training dataset only
-train_df = pd.read_csv("DATA/processed/train.csv")
 
-print("=" * 60)
-print("TRAIN DATASET OVERVIEW")
-print("=" * 60)
+def analyze_features():
+    """
+    Display basic information about the training dataset.
+    """
 
-print("\nShape:")
-print(train_df.shape)
+    # Load training dataset
+    train_df = pd.read_csv("DATA/processed/train.csv")
 
-print("\nColumns:")
-print(train_df.columns.tolist())
+    print("=" * 60)
+    print("TRAIN DATASET OVERVIEW")
+    print("=" * 60)
 
-print("\nMissing Values:")
-print(train_df.isnull().sum().sum())
+    print("\nShape:")
+    print(train_df.shape)
 
-print("\nFeature Summary:")
-print(train_df.describe().T)
+    print("\nColumns:")
+    print(train_df.columns.tolist())
+
+    print("\nMissing Values:")
+    print(train_df.isnull().sum().sum())
+
+    print("\nFeature Summary:")
+    print(train_df.describe().T)
+
+
+def main():
+    """
+    Run feature analysis.
+    """
+    analyze_features()
+
+
+if __name__ == "__main__":
+    main()

@@ -1,3 +1,11 @@
+"""
+engine_split.py
+
+Purpose:
+Create an engine-level Train/Validation/Test split
+to prevent data leakage between datasets.
+"""
+
 import json
 import os
 
@@ -32,6 +40,14 @@ def create_engine_split(df):
     print(f"Test Engines       : {len(test_engines)}")
 
 
-if __name__ == "__main__":
+def main():
+    """
+    Load the raw dataset and create the engine split.
+    """
+
     df = load_data("DATA/raw/train_FD001.txt")
     create_engine_split(df)
+
+
+if __name__ == "__main__":
+    main()
