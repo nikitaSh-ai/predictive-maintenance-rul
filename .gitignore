@@ -1,4 +1,4 @@
-# Python
+# Python cache
 __pycache__/
 *.py[cod]
 
@@ -6,6 +6,9 @@ __pycache__/
 .venv/
 venv/
 env/
+
+# Trained models
+models/*.pth
 
 # Jupyter
 .ipynb_checkpoints/
@@ -16,3 +19,7 @@ env/
 # OS files
 .DS_Store
 Thumbs.db
+
+
+# Logs
+*.log

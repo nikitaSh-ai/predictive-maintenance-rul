@@ -8,12 +8,17 @@ Remaining Useful Life prediction.
 
 import torch
 import numpy as np
+import pandas as pd
 import torch.nn as nn
+import matplotlib.pyplot as plt
 
 from src.models.gru_model import GRUModel
 from torch.utils.data import(
      TensorDataset,DataLoader
       )
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+
 def load_sequences():
     """
     Load train, validation and test sequences.
@@ -85,22 +90,6 @@ def train_one_epoch(
     return average_loss
 
     
-    optimizer.zero_grad()
-
-    loss.backward()
-
-    torch.nn.utils.clip_grad_norm_(
-            model.parameters(),
-            max_norm=1.0
-        )
-
-    optimizer.step()
-
-    running_loss += loss.item()
-
-    average_loss = running_loss / len(train_loader)
-
-    return average_loss
 
 
 
@@ -298,36 +287,14 @@ def main():
     print(optimizer)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    train_loss_history = []
+    validation_loss_history = []
     best_val_loss = float("inf")
     patience = 3
-    counter = 0
+    early_stop_counter = 0
 
-    epochs = 20
-    for epoch in range(epochs):
+    num_epochs = 20
+    for epoch in range(num_epochs):
 
         # -----------------------
         # Train One Epoch
@@ -348,9 +315,13 @@ def main():
             criterion=criterion,
             device=device
              )
+        
 
 
-        print(f"\nEpoch {epoch + 1}/{epochs}")
+        train_loss_history.append(train_loss)
+        validation_loss_history.append(validation_loss)
+
+        print(f"\nEpoch {epoch + 1}/{num_epochs}")
 
         print(f"Training Loss : {train_loss:.6f}")
 
@@ -359,66 +330,59 @@ def main():
         
         if validation_loss < best_val_loss:
             best_val_loss = validation_loss
-            torch.save(model.state_dict(), "best_gru_model.pth")
+            torch.save(model.state_dict(), "models/best_gru.pth")
             print("Best model saved!")
-            counter = 0
+            early_stop_counter = 0
         else:
-            counter += 1
+            early_stop_counter += 1
 
-        if counter >= patience:
+        if early_stop_counter >= patience:
              print("Early stopping triggered!")
              break
         
     
-    model.load_state_dict(torch.load("best_gru_model.pth"))
+    model.load_state_dict(torch.load("models/best_gru.pth"))
     model.eval()
+    print("\nTraining completed successfully.")
 
-    
-    # =========================
-    # TEST PREDICTIONS
-    # =========================
+    print("\nTraining History")
 
-    all_preds = []
-    all_actuals = []
+    print("Training Losses")
+    print(train_loss_history)
 
-    with torch.no_grad():
+    print("\nValidation Losses")
+    print(validation_loss_history)
 
-        for X_batch, y_batch in test_loader:
 
-            X_batch = X_batch.to(device)
-            y_batch = y_batch.to(device)
 
-            predictions = model(X_batch)
+    plt.figure(figsize=(8, 5))
 
-            all_preds.append(predictions.cpu().numpy())
-            all_actuals.append(y_batch.cpu().numpy())
+    plt.plot(
+    train_loss_history,
+    label="Training Loss"
+    )
 
-    import numpy as np
+    plt.plot(
+    validation_loss_history,
+    label="Validation Loss"
+    )
 
-    all_preds = np.concatenate(all_preds).flatten()
-    all_actuals = np.concatenate(all_actuals).flatten()
-    
+    plt.xlabel("Epoch")
 
-    from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-    import numpy as np
+    plt.ylabel("Loss")
 
-    mae = mean_absolute_error(all_actuals, all_preds)
-    rmse = np.sqrt(mean_squared_error(all_actuals, all_preds))
-    r2 = r2_score(all_actuals, all_preds)
+    plt.title("GRU Training History")
 
-    print("\n=========================")
-    print("TEST EVALUATION RESULTS")
-    print("=========================")
- 
-    print(f"MAE  : {mae:.4f}")
-    print(f"RMSE : {rmse:.4f}")
-    print(f"R2   : {r2:.4f}")
-    
+    plt.legend()
 
-    # print(y_train.min().item())
-    # print(y_train.max().item())
+    plt.grid(True)
 
-    
-    
+    plt.savefig("results/training_loss.png")
+
+    plt.show()
+
+
+
+
 if __name__ == "__main__":
      main()
