@@ -17,7 +17,7 @@ class GRUModel(nn.Module):
     def __init__(
     self,
     input_size=17,
-    hidden_size=64,
+    hidden_size=128,
     num_layers=1
      ):
      """
@@ -30,11 +30,15 @@ class GRUModel(nn.Module):
      self.hidden_size = hidden_size
      self.num_layers = num_layers
      self.gru = nn.GRU(
-      input_size=self.input_size,
-      hidden_size=self.hidden_size,
-      num_layers=self.num_layers,
-      batch_first=True
-       )
+       input_size=self.input_size,
+       hidden_size=self.hidden_size,
+       num_layers=self.num_layers,
+       batch_first=True
+      )
+     self.dropout = nn.Dropout(
+     p=0.2
+      )
+     
      self.fc = nn.Linear(
         in_features=self.hidden_size,
         out_features=1
@@ -43,19 +47,23 @@ class GRUModel(nn.Module):
         """
         Forward pass of the GRU model.
         """
-
         _, hidden = self.gru(x)
 
-        output = self.fc(hidden[-1])
+        hidden = self.dropout(
+        hidden[-1]
+        )
+
+        output = self.fc(hidden)
+
         return output
-     
+    
 
 
 if __name__ == "__main__":
 
     model = GRUModel(
         input_size=17,
-        hidden_size=64,
+        hidden_size=128,
         num_layers=1
     )
 

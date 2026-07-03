@@ -6,17 +6,44 @@ Train the GRU model for
 Remaining Useful Life prediction.
 """
 
+
+import random
+import joblib
+import os
 import torch
 import numpy as np
 import pandas as pd
 import torch.nn as nn
 import matplotlib.pyplot as plt
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from src.models.gru_model import GRUModel
 from torch.utils.data import(
      TensorDataset,DataLoader
       )
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+
+def set_seed(seed=42):
+    """
+    Set random seed for reproducible experiments.
+    """
+
+    random.seed(seed)
+
+    np.random.seed(seed)
+
+    torch.manual_seed(seed)
+
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+
+
 
 
 def load_sequences():
@@ -133,6 +160,8 @@ def validate_one_epoch(
 
 
 def main():
+     
+    set_seed(42)
 
     (
     X_train,
@@ -141,7 +170,7 @@ def main():
     y_validation,
     X_test,
     y_test
-     ) = load_sequences()
+    ) = load_sequences()
     
     print("=" * 60)
     print("GRU TRAINING")
@@ -185,11 +214,16 @@ def main():
 # -----------------------
 
     batch_size = 64
+    generator = torch.Generator()
+    generator.manual_seed(42)
+
     train_loader = DataLoader(
     train_dataset,
     batch_size=batch_size,
-    shuffle=True
-     )
+    shuffle=True,
+    generator=generator
+    )
+
 
     validation_loader = DataLoader(
     validation_dataset,
@@ -246,7 +280,7 @@ def main():
 
     model = GRUModel(
     input_size=17,
-    hidden_size=64,
+    hidden_size=128,
     num_layers=1
      )
     
@@ -280,8 +314,17 @@ def main():
 
     optimizer = torch.optim.Adam(
     model.parameters(),
-    lr=0.001
-      )
+    lr=0.001,
+    weight_decay=1e-4
+    )
+    
+    scheduler = ReduceLROnPlateau(
+    optimizer,
+    mode="min",
+    factor=0.5,
+    patience=2
+    )
+
 
     print("\nOptimizer:")
     print(optimizer)
@@ -316,7 +359,7 @@ def main():
             device=device
              )
         
-
+        scheduler.step(validation_loss)
 
         train_loss_history.append(train_loss)
         validation_loss_history.append(validation_loss)
@@ -326,6 +369,11 @@ def main():
         print(f"Training Loss : {train_loss:.6f}")
 
         print(f"Validation Loss : {validation_loss:.6f}")
+        print(f"Learning Rate : "f"{optimizer.param_groups[0]['lr']:.6f}")
+
+
+       
+
 
         
         if validation_loss < best_val_loss:
@@ -352,6 +400,28 @@ def main():
 
     print("\nValidation Losses")
     print(validation_loss_history)
+
+ 
+    #--------------------------------
+    # to save the training history permanently 
+    #------------------------------------
+
+    os.makedirs(
+    "results/gru",
+    exist_ok=True
+    )
+
+    history = {
+    "train_loss": train_loss_history,
+    "validation_loss": validation_loss_history
+    }
+
+    joblib.dump(
+    history,
+    "results/gru/training_history.pkl"
+    )
+
+    print("Training history saved.")
 
 
 

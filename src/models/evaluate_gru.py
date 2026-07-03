@@ -67,7 +67,7 @@ def main():
 
     model = GRUModel(
     input_size=17,
-    hidden_size=64,
+    hidden_size=128,
     num_layers=1
     )
 

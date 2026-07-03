@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 
-SEQ_LENGTH = 30
+SEQ_LENGTH = 40
 TARGET_COLUMN = "RUL_CLIPPED"
 
 
