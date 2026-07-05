@@ -9,7 +9,13 @@ maintenance decisions for engineers.
 import pandas as pd
 import json
 
+
+
+
+
 def main():
+
+    uncertainty_path = "results/uncertainty_results.csv"
 
     print("=" * 60)
     print("DECISION INTELLIGENCE ENGINE")
@@ -57,6 +63,72 @@ def main():
 
 
 
+    # ---------------------------------
+    # Load Uncertainty
+    # ---------------------------------
+
+    uncertainty_df = pd.read_csv(  "results/gru_uncertainty_results.csv"
+    )
+
+    print("\nUncertainty Loaded Successfully.")
+
+    print(uncertainty_df.head())
+
+
+    # ---------------------------------
+    # Extract Uncertainty
+    # ---------------------------------
+
+    prediction_uncertainty = float(
+    uncertainty_df.loc[0, "Uncertainty"]
+    )
+
+    print("\nPrediction Uncertainty")
+
+    print(f"{prediction_uncertainty:.2f}")
+
+
+
+
+    # ---------------------------------
+    # Prediction Interval
+    # ---------------------------------
+
+    lower_bound = float(
+    uncertainty_df.loc[0, "Lower_Bound"]
+)
+
+    upper_bound = float(
+    uncertainty_df.loc[0, "Upper_Bound"]
+)
+
+    print("\nPrediction Interval")
+
+    print(f"{lower_bound:.2f} to {upper_bound:.2f} cycles")
+
+
+    # ---------------------------------
+    # Decision Confidence
+    # ---------------------------------
+
+    if prediction_uncertainty <= 5:
+
+     decision_confidence = "High"
+
+    elif prediction_uncertainty <= 10:
+
+     decision_confidence = "Medium"
+
+    else:
+
+     decision_confidence = "Low"
+
+    print("\nDecision Confidence")
+
+    print(decision_confidence)
+
+
+
 
     # ---------------------------------
     # Extract Prediction
@@ -68,7 +140,29 @@ def main():
 
     print("\nPredicted RUL")
 
-    print(predicted_rul)
+    print(
+    f"{predicted_rul:.2f} ± {prediction_uncertainty:.2f} cycles"
+)
+
+
+    # ---------------------------------
+    # Health Score
+    # ---------------------------------
+
+    MAX_RUL = 125
+
+    health_score = (
+    predicted_rul / MAX_RUL
+    ) * 100
+
+    health_score = min(
+    health_score,
+    100
+    )
+
+    print("\nHealth Score")
+
+    print(f"{health_score:.2f}%")
 
 
     # ---------------------------------
@@ -178,6 +272,7 @@ def main():
     ):
      print(f"{i}. {sensor}")
 
+    
 
 
 
@@ -187,14 +282,17 @@ def main():
     # ---------------------------------
     # AI Reasoning
     # ---------------------------------
-
     reason = (
-    "The recommendation is based on the "
-    "predicted Remaining Useful Life and "
-    "the three most influential features "
-    "identified using Captum Integrated Gradients."
-     )
-
+    f"The engine is classified as {risk_level.lower()} risk "
+    f"with a predicted remaining useful life of "
+    f"{predicted_rul:.0f} cycles. "
+    f"The recommendation focuses on "
+    f"{inspection_targets[0]}, "
+    f"{inspection_targets[1]} and "
+    f"{inspection_targets[2]} because they were identified as the "
+    f"most influential features by Captum Integrated Gradients."
+   )
+    
     print("\nAI Reasoning")
 
     print(reason)
@@ -246,6 +344,22 @@ def main():
 
     print(f"Predicted RUL        : {predicted_rul:.2f} cycles")
 
+    print(
+    f"Prediction Interval : "
+    f"{lower_bound:.2f} - {upper_bound:.2f} cycles"
+    )
+
+    print(
+    f"Prediction Uncertainty : "
+    f"±{prediction_uncertainty:.2f} cycles"
+     )
+
+    print(f"Health Score         : {health_score:.2f}%")
+
+    print(
+    f"Decision Confidence : {decision_confidence}"
+)
+
     print(f"Risk Level           : {risk_level}")
 
     print(f"Maintenance Priority : {priority}")
@@ -261,6 +375,8 @@ def main():
     start=1
     ):
       print(f"{i}. {sensor}")
+    print("\nInspection Guidance : ")
+    print("The sensors listed above contributed most strongly to the predicted Remaining Useful Life. Prioritize inspection of these sensors during the next scheduled maintenance activity and compare their readings with historical operating trends before making maintenance decisions.")
 
     print("\nMaintenance Window")
 
@@ -298,7 +414,26 @@ def main():
 
     "Inspection_Target_3": inspection_targets[2],
 
-    "Reason": reason
+    "Reason": reason,
+
+    "Prediction_Uncertainty": round(prediction_uncertainty,2),
+
+    "Decision_Confidence": decision_confidence,
+
+    "Prediction_Uncertainty": round(
+    prediction_uncertainty,
+    2
+    ),
+
+    "Lower_Bound": round(
+    lower_bound,
+    2
+    ),
+
+    "Upper_Bound": round(
+    upper_bound,
+    2
+    ),
 
     }
 

@@ -7,5 +7,9 @@
     "Inspection_Target_1": "sensor_15",
     "Inspection_Target_2": "sensor_4",
     "Inspection_Target_3": "sensor_11",
-    "Reason": "The recommendation is based on the predicted Remaining Useful Life and the three most influential features identified using Captum Integrated Gradients."
+    "Reason": "The engine is classified as low risk with a predicted remaining useful life of 119 cycles. The recommendation focuses on sensor_15, sensor_4 and sensor_11 because they were identified as the most influential features by Captum Integrated Gradients.",
+    "Prediction_Uncertainty": 4.73,
+    "Decision_Confidence": "High",
+    "Lower_Bound": 109.65,
+    "Upper_Bound": 128.19
 }
