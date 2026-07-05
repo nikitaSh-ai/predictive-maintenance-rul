@@ -1,0 +1,11 @@
+{
+    "Predicted_RUL": 119.0,
+    "Risk_Level": "Low",
+    "Maintenance_Priority": "Routine",
+    "Maintenance_Action": "Continue normal operation.",
+    "Maintenance_Window": "No immediate maintenance required. Approximately 119 operating cycles remain.",
+    "Inspection_Target_1": "sensor_15",
+    "Inspection_Target_2": "sensor_4",
+    "Inspection_Target_3": "sensor_11",
+    "Reason": "The recommendation is based on the predicted Remaining Useful Life and the three most influential features identified using Captum Integrated Gradients."
+}

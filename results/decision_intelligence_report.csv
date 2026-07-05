@@ -1,0 +1,2 @@
+Predicted_RUL,Risk_Level,Maintenance_Priority,Maintenance_Action,Maintenance_Window,Inspection_Target_1,Inspection_Target_2,Inspection_Target_3,Reason
+119.0,Low,Routine,Continue normal operation.,No immediate maintenance required. Approximately 119 operating cycles remain.,sensor_15,sensor_4,sensor_11,The recommendation is based on the predicted Remaining Useful Life and the three most influential features identified using Captum Integrated Gradients.
