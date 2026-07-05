@@ -292,7 +292,7 @@ def main():
     # Feature Importance
     # -----------------------
 
-    sequence_length = 30
+    sequence_length = 40
 
     feature_names = []
 
@@ -357,6 +357,9 @@ def main():
     plt.close()
 
     print(f"Top {top_k} feature importance plot saved.")
+
+
+
 
 if __name__ == "__main__":
     main()
