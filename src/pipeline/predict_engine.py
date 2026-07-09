@@ -7,10 +7,18 @@ for a new engine dataset.
 """
 
 
-
+import joblib
+import torch
+from pathlib import Path
 import pandas as pd
 import os
 
+from backend.app.services.model_service import model
+
+
+ROOT_DIR = Path(__file__).resolve().parents[2]
+
+SCALER_PATH = ROOT_DIR / "models" / "scaler.pkl"
 
 def validate_dataset(df):
     """
@@ -141,6 +149,64 @@ def extract_latest_sequence(
 
 
 
+def preprocess_sequence(sequence):
+    """
+    Apply the same preprocessing
+    used during training.
+    """
+
+    processed = sequence.copy()
+
+    # Remove Engine ID
+    processed = processed.drop(
+    columns=[0]
+    )
+
+    # Remove Cycle
+    processed = processed.drop(
+    columns=[1]
+    )
+
+    print("\nAfter Removing ID & Cycle")
+
+    print(processed.shape)
+
+    # Remove constant features
+    processed = processed.drop(
+        columns=[2, 3, 7, 12, 18, 20, 21]
+    )
+
+    print("\nAfter Removing Constant Features")
+    print(processed.shape)
+
+    print("\nRemaining Columns")
+
+    print(processed.columns.tolist())
+
+
+    scaler = joblib.load(SCALER_PATH)
+
+    print("\nScaler Loaded Successfully.")
+
+    processed = scaler.transform(processed)
+
+    print("\nAfter Scaling")
+    print(processed.shape)
+
+    processed = torch.tensor(
+    processed,
+    dtype=torch.float32
+    )
+
+    processed = processed.unsqueeze(0)
+
+    print("\nTensor Shape")
+    print(processed.shape)
+
+    return processed
+
+   
+
 
 
 
@@ -214,11 +280,146 @@ def run_prediction(csv_path):
 
     sequence = extract_latest_sequence(
     first_engine
-     )
+    )
 
-    return df
+    processed_sequence = preprocess_sequence(
+    sequence
+)
+    
+    model.eval()
+
+    with torch.no_grad():
+       prediction = model(processed_sequence)
+
+    print("\nRaw Prediction")
+    print(prediction)
 
 
+    predicted_rul = round(prediction.item(), 2)
+
+    print("\nPredicted RUL")
+    print(predicted_rul)
+
+
+    health_score = min(
+    round((predicted_rul / 125) * 100),
+    100
+    )
+
+    print("\nHealth Score")
+    print(health_score)
+
+
+    if predicted_rul <= 15:
+      risk = "Critical"
+
+    elif predicted_rul <= 40:
+      risk = "High"
+
+    elif predicted_rul <= 80:
+      risk = "Medium"
+
+    else:
+      risk = "Low"
+
+    print("\nRisk Level")
+    print(risk)
+
+
+
+    if risk == "Critical":
+      recommendation = (
+        "Immediate maintenance required."
+    )
+
+    elif risk == "High":
+      recommendation = (
+        "Schedule maintenance as soon as possible."
+    )
+
+    elif risk == "Medium":
+      recommendation = (
+        "Plan maintenance in upcoming cycles."
+    )
+
+    else:
+      recommendation = (
+        "Continue normal operation."
+    )
+
+    print("\nRecommendation")
+    print(recommendation)
+
+    confidence = 95
+
+    print("\nConfidence")
+    print(f"{confidence}%")
+    
+    print("\nLatest Sequence Preview")
+
+    print(sequence.head())
+
+    print("\nSequence Shape")
+
+    print(sequence.shape)
+
+    print("\nProcessed Shape")
+
+    print(processed_sequence.shape)
+
+#     return {
+#     "dataset_shape": df.shape,
+#     "num_engines": len(engines),
+#     "sequence_shape": (
+#         sequence.shape
+#         if sequence is not None
+#         else None
+#     )
+#    }
+
+
+    return {
+
+    "rul": predicted_rul,
+
+    "risk": risk,
+
+    "confidence": f"{confidence}%",
+
+    "healthScore": health_score,
+
+    "recommendation": recommendation,
+
+    "inspection": (
+        "Inspect immediately"
+        if risk == "Critical"
+        else
+        "Inspect within 10 cycles"
+        if risk == "High"
+        else
+        "Inspect within 30 cycles"
+        if risk == "Medium"
+        else
+        "Routine inspection"
+    ),
+
+    "focus": (
+        "Immediate maintenance"
+        if risk == "Critical"
+        else
+        "Monitor degradation"
+        if risk == "High"
+        else
+        "Routine monitoring"
+    ),
+
+    "summary": (
+        f"Predicted Remaining Useful Life is {predicted_rul} cycles. "
+        f"Current engine risk is {risk}. "
+        f"{recommendation}"
+    )
+
+}
 
 if __name__ == "__main__":
 

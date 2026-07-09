@@ -23,3 +23,14 @@ Thumbs.db
 
 # Logs
 *.log
+
+
+# Frontend dependencies
+node_modules/
+frontend/node_modules/
+
+# Scaler
+models/*.pth
+
+# Processed scaler
+DATA/processed/*.pkl
