@@ -6,21 +6,58 @@ const api = axios.create({
 
 export const predictRUL = async (file) => {
 
-    const formData = new FormData();
+    try {
 
-    formData.append("file", file);
+        const formData = new FormData();
 
-    const response = await api.post(
-        "/predict",
-        formData,
+        formData.append("file", file);
+
+        const response = await api.post(
+            "/predict",
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            }
+        );
+
+        return response.data;
+
+    } catch (error) {
+
+    throw new Error(
+        error.response?.data?.detail ||
+        "Prediction failed.",
         {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
+            cause: error,
         }
     );
 
-    return response.data;
+}
+
 };
 
 export default api;
+
+
+export const getExplainability = async () => {
+
+    const response = await api.get(
+        "/explain"
+    );
+
+    return response.data;
+
+};
+
+
+export const getUncertainty = async () => {
+
+    const response = await api.get(
+        "/uncertainty"
+    );
+
+    return response.data;
+
+};

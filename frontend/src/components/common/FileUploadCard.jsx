@@ -105,7 +105,13 @@ function FileUploadCard({
                 id="engine-file"
                 type="file"
                 accept=".csv,.txt"
-                onChange={onChange}
+               onChange={(event) => {
+
+    onChange(event);
+
+    event.target.value = "";
+
+}}
                 className="hidden"
             />
 

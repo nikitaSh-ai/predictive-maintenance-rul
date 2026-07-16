@@ -1,11 +1,50 @@
 import { NavLink } from "react-router-dom";
+import { X } from "lucide-react";
 import navigation from "../../config/navigation";
-
-function Sidebar() {
+function Sidebar({
+    sidebarOpen,
+    setSidebarOpen,
+}) {
   return (
-  <aside className="w-72 bg-white border-r border-gray-200 flex flex-col shadow-sm">
+<aside
+    className={`
+        fixed
+        top-0
+        left-0
+        h-full
+        w-72
+        bg-white
+        border-r
+        border-gray-200
+        shadow-lg
+        z-50
+        transform
+        transition-transform
+        duration-300
 
-       <div className="p-6 border-b border-gray-200">
+        ${
+            sidebarOpen
+                ? "translate-x-0"
+                : "-translate-x-full"
+        }
+
+        md:translate-x-0
+        md:static
+        md:flex
+        md:flex-col
+    `}
+>
+<div
+    className="
+        p-6
+        border-b
+        border-gray-200
+        flex
+        items-start
+        justify-between
+    "
+>
+<div>
 
     <h2 className="text-xl font-bold text-blue-700">
         Predictive Maintenance
@@ -14,6 +53,21 @@ function Sidebar() {
     <p className="text-sm text-gray-500 mt-1">
         Industrial AI Dashboard
     </p>
+
+</div>
+
+<button
+    onClick={() => setSidebarOpen(false)}
+    className="
+        md:hidden
+        p-2
+        rounded-lg
+        hover:bg-gray-100
+    "
+>
+    <X size={22} />
+</button>
+   
 
 </div>
 
@@ -28,6 +82,11 @@ function Sidebar() {
             <NavLink
               key={item.path}
               to={item.path}
+               onClick={() => {
+        if (window.innerWidth < 768) {
+            setSidebarOpen(false);
+        }
+    }}
               className={({ isActive }) =>
 `
 flex items-center

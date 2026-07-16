@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { predictRUL } from "../services/api";
 
@@ -14,8 +15,11 @@ function PredictRUL() {
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [predictionResult, setPredictionResult] = useState(null);
+    const [success, setSuccess] = useState("");
+   
 
-    const [isPredicting, setIsPredicting] = useState(false);
+
+    
 
     const handleFileChange = (event) => {
 
@@ -76,17 +80,39 @@ const handlePredict = async () => {
 
     const result = await predictRUL(selectedFile);
 
-    setPredictionResult(result);
+    setPredictionResult({
+    predicted_rul: result.predicted_rul,
+    risk: result.risk,
+    priority: result.priority,
+    confidence: result.confidence,
+    healthScore: result.health_score,
+    recommendation: result.recommendation,
+    inspection: result.inspection,
+    focus: result.focus,
+    summary: result.summary,
+    uncertainty: result.uncertainty,
+    reason: result.reason,
+});
 
-    }
+setSuccess("Prediction completed successfully.");
+setTimeout(() => {
+
+    setSuccess("");
+
+}, 3000);
+
+}
     catch (error) {
 
       setError(
-        error.response?.data?.detail ||
+        error.message ||
         "Prediction failed."
-       );
+      );
 
     }
+
+    
+    
     finally {
 
       setIsLoading(false);
@@ -107,6 +133,26 @@ const handlePredict = async () => {
                     Predict Remaining Useful Life
 
                 </h1>
+
+                {
+    success && (
+        <div
+            className="
+                mt-6
+                mb-6
+                p-4
+                rounded-xl
+                border
+                border-green-300
+                bg-green-50
+                text-green-700
+                font-medium
+            "
+        >
+            ✅ {success}
+        </div>
+    )
+}
 
                 <p className="text-gray-500 mt-2">
 
@@ -131,34 +177,7 @@ const handlePredict = async () => {
 </Button>
 
 
-{
-    isPredicting && (
 
-        <div className="text-center py-10">
-
-            <div
-                className="
-                    w-16
-                    h-16
-                    border-4
-                    border-blue-200
-                    border-t-blue-600
-                    rounded-full
-                    animate-spin
-                    mx-auto
-                "
-            />
-
-            <p className="mt-5 text-gray-500">
-
-                AI model is analyzing engine health...
-
-            </p>
-
-        </div>
-
-    )
-}
 
 {
     isLoading && <LoadingSpinner />

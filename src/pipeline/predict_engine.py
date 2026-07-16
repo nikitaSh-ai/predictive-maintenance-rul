@@ -7,6 +7,22 @@ for a new engine dataset.
 """
 
 
+
+
+
+from backend.app.services.prediction_service import (
+    save_prediction
+)
+
+from src.decision.decision_engine import (
+    generate_decision
+)
+
+from src.explainability.uncertainty import (
+    monte_carlo_prediction
+)
+
+from backend.app.services.explainability_service import generate_attributions
 import joblib
 import torch
 from pathlib import Path
@@ -14,6 +30,10 @@ import pandas as pd
 import os
 
 from backend.app.services.model_service import model
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
@@ -25,7 +45,7 @@ def validate_dataset(df):
     Validate uploaded dataset.
     """
 
-    print("\nValidating Dataset...")
+    logger.info("Validating uploaded dataset.")
 
     if df.empty:
 
@@ -33,7 +53,7 @@ def validate_dataset(df):
             "Uploaded dataset is empty."
         )
 
-    print("Dataset is not empty.")
+    logger.info("Dataset validation passed: dataset is not empty.")
 
     expected_columns = 26
 
@@ -43,14 +63,14 @@ def validate_dataset(df):
         f"Expected {expected_columns} columns but found {df.shape[1]}."
      )
 
-    print("Column count is valid.")
+    logger.info("Dataset validation passed: column count is valid.")
 
 
     try:
 
       df = df.apply(pd.to_numeric)
 
-      print("All values are numeric.")
+      logger.info("Dataset validation passed: all values are numeric.")
 
     except Exception:
 
@@ -73,7 +93,7 @@ def validate_dataset(df):
         f"Dataset contains {missing_values} missing values."
     )
 
-    print("No missing values found.")
+    logger.info("Dataset validation passed: no missing values found.")
 
     return True
 
@@ -89,7 +109,7 @@ def split_by_engine(df):
     into individual engines.
     """
 
-    print("\nSplitting Dataset by Engine...")
+    logger.info("Splitting dataset by engine.")
 
     engines = {}
 
@@ -103,7 +123,7 @@ def split_by_engine(df):
 
         engines[engine_id] = engine_df
 
-    print(f"Number of Engines : {len(engines)}")
+    logger.info(f"Detected {len(engines)} engine(s) in the uploaded dataset.")
 
     return engines
 
@@ -124,26 +144,41 @@ def extract_latest_sequence(
     from one engine.
     """
 
-    print(
-        f"\nEngine {engine_df.iloc[0,0]}"
+    logger.info(
+    f"Processing Engine ID: {engine_df.iloc[0,0]}"
+    )
+    
+    logger.info(
+    f"Engine contains {len(engine_df)} cycle(s)."
     )
 
-    print(
-        f"Cycles : {len(engine_df)}"
-    )
+   
 
     if len(engine_df) < sequence_length:
 
-        return None
+      logger.info(
+    "Engine sequence shorter than 40 cycles. Applying automatic padding."
+     )
 
-    latest_sequence = engine_df.tail(
+      padding_rows = sequence_length - len(engine_df)
+
+      first_row = engine_df.iloc[[0]]
+
+      padding = pd.concat(
+        [first_row] * padding_rows,
+        ignore_index=True
+      )
+
+      latest_sequence = pd.concat(
+        [padding, engine_df],
+        ignore_index=True
+      )
+
+    else:
+
+      latest_sequence = engine_df.tail(
         sequence_length
-    )
-
-    print(
-        "Latest Sequence Shape :",
-        latest_sequence.shape
-    )
+      )
 
     return latest_sequence
 
@@ -157,41 +192,38 @@ def preprocess_sequence(sequence):
 
     processed = sequence.copy()
 
-    # Remove Engine ID
+    # Remove Engine ID and Cycle
     processed = processed.drop(
-    columns=[0]
+     columns=[
+        "engine_id",
+        "cycle",
+      ]
     )
-
-    # Remove Cycle
-    processed = processed.drop(
-    columns=[1]
-    )
-
-    print("\nAfter Removing ID & Cycle")
-
-    print(processed.shape)
 
     # Remove constant features
     processed = processed.drop(
-        columns=[2, 3, 7, 12, 18, 20, 21]
+    columns=[
+        "op_setting_3",
+        "sensor_1",
+        "sensor_5",
+        "sensor_10",
+        "sensor_16",
+        "sensor_18",
+        "sensor_19",
+      ]
     )
 
-    print("\nAfter Removing Constant Features")
-    print(processed.shape)
-
-    print("\nRemaining Columns")
-
-    print(processed.columns.tolist())
+    
+    
 
 
     scaler = joblib.load(SCALER_PATH)
 
-    print("\nScaler Loaded Successfully.")
+    logger.info("Feature scaler loaded successfully.")
 
     processed = scaler.transform(processed)
 
-    print("\nAfter Scaling")
-    print(processed.shape)
+    
 
     processed = torch.tensor(
     processed,
@@ -200,9 +232,7 @@ def preprocess_sequence(sequence):
 
     processed = processed.unsqueeze(0)
 
-    print("\nTensor Shape")
-    print(processed.shape)
-
+    
     return processed
 
    
@@ -226,12 +256,7 @@ def run_prediction(csv_path):
         Prediction results.
     """
 
-    print("=" * 60)
-    print("PREDICTION PIPELINE")
-    print("=" * 60)
-
-    print("\nInput File")
-    print(csv_path)
+    logger.info(f"Starting prediction pipeline for file: {csv_path}")
 
     # -------------------------
     # Load Uploaded CSV
@@ -247,10 +272,20 @@ def run_prediction(csv_path):
 
     elif extension == ".txt":
 
-     df = pd.read_csv(
+      column_names = [
+        "engine_id",
+        "cycle",
+        "op_setting_1",
+        "op_setting_2",
+        "op_setting_3",
+        *[f"sensor_{i}" for i in range(1, 22)],
+      ]
+
+      df = pd.read_csv(
         csv_path,
         sep=r"\s+",
-        header=None
+        header=None,
+        names=column_names,
       )
 
     else:
@@ -259,25 +294,31 @@ def run_prediction(csv_path):
         "Unsupported file format."
        )
 
-    print("\nDataset Loaded Successfully.")
+
+    # ---------------------------------
+    # Debug Logs
+    # Remove or replace with logging
+    # before deployment
+    # ---------------------------------
+    
+    logger.info("Dataset loaded successfully.")
  
-    print(df.head())
+    
 
-    print("\nDataset Shape")
+    
 
-    print(df.shape)
+   
 
     validate_dataset(df)
 
     engines = split_by_engine(df)
 
-    print("\nEngine IDs")
-
-    print(list(engines.keys())[:10])
 
 
-    first_engine = engines[1]
+    
 
+    first_engine = next(iter(engines.values()))
+   
     sequence = extract_latest_sequence(
     first_engine
     )
@@ -289,16 +330,36 @@ def run_prediction(csv_path):
     model.eval()
 
     with torch.no_grad():
-       prediction = model(processed_sequence)
+      prediction = model(processed_sequence)
 
-    print("\nRaw Prediction")
-    print(prediction)
+    logger.info("GRU model prediction completed.")
+
+
+    feature_importance = generate_attributions(
+     processed_sequence
+    )
+
+    
+
+    
+
+
+    uncertainty = monte_carlo_prediction(
+
+    model,
+
+    processed_sequence
+
+   )
+
+    
+
+    
 
 
     predicted_rul = round(prediction.item(), 2)
 
-    print("\nPredicted RUL")
-    print(predicted_rul)
+    logger.info(f"Predicted RUL: {predicted_rul} cycles.")
 
 
     health_score = min(
@@ -306,8 +367,7 @@ def run_prediction(csv_path):
     100
     )
 
-    print("\nHealth Score")
-    print(health_score)
+    logger.info(f"Calculated Health Score: {health_score}%.")
 
 
     if predicted_rul <= 15:
@@ -322,104 +382,93 @@ def run_prediction(csv_path):
     else:
       risk = "Low"
 
-    print("\nRisk Level")
-    print(risk)
+    logger.info(f"Risk Level: {risk}.")
 
 
-
-    if risk == "Critical":
-      recommendation = (
-        "Immediate maintenance required."
+    decision = generate_decision(
+    risk,
+    uncertainty["std"]
     )
 
-    elif risk == "High":
-      recommendation = (
-        "Schedule maintenance as soon as possible."
+    logger.info(
+    f"Decision generated with priority {decision['priority']}."
     )
 
-    elif risk == "Medium":
-      recommendation = (
-        "Plan maintenance in upcoming cycles."
-    )
+
+    
+
+    if uncertainty["std"] < 1:
+
+     confidence = 98
+
+    elif uncertainty["std"] < 2:
+
+     confidence = 95
+
+    elif uncertainty["std"] < 3:
+
+     confidence = 90
+
+    elif uncertainty["std"] < 5:
+
+     confidence = 80
 
     else:
-      recommendation = (
-        "Continue normal operation."
+
+     confidence = 70
+
+    logger.info(
+    f"Prediction confidence: {confidence}%."
     )
-
-    print("\nRecommendation")
-    print(recommendation)
-
-    confidence = 95
-
-    print("\nConfidence")
-    print(f"{confidence}%")
     
-    print("\nLatest Sequence Preview")
+    logger.info(f"Columns: {list(df.columns)}")
+    logger.info(f"Shape: {df.shape}")
+    
 
-    print(sequence.head())
+    prediction_result = {
 
-    print("\nSequence Shape")
-
-    print(sequence.shape)
-
-    print("\nProcessed Shape")
-
-    print(processed_sequence.shape)
-
-#     return {
-#     "dataset_shape": df.shape,
-#     "num_engines": len(engines),
-#     "sequence_shape": (
-#         sequence.shape
-#         if sequence is not None
-#         else None
-#     )
-#    }
-
-
-    return {
-
-    "rul": predicted_rul,
+    "predicted_rul": predicted_rul,
 
     "risk": risk,
 
+    "priority": decision["priority"],
+
     "confidence": f"{confidence}%",
 
-    "healthScore": health_score,
+    "health_score": health_score,
 
-    "recommendation": recommendation,
 
-    "inspection": (
-        "Inspect immediately"
-        if risk == "Critical"
-        else
-        "Inspect within 10 cycles"
-        if risk == "High"
-        else
-        "Inspect within 30 cycles"
-        if risk == "Medium"
-        else
-        "Routine inspection"
-    ),
+    "recommendation": decision["recommendation"],
 
-    "focus": (
-        "Immediate maintenance"
-        if risk == "Critical"
-        else
-        "Monitor degradation"
-        if risk == "High"
-        else
-        "Routine monitoring"
-    ),
+    
+    "inspection": decision["inspection"],
+
+
+    "focus": decision["focus"],
+
+    "reason": decision["reason"],
 
     "summary": (
         f"Predicted Remaining Useful Life is {predicted_rul} cycles. "
         f"Current engine risk is {risk}. "
-        f"{recommendation}"
-    )
+
+
+       
+
+        f"{decision['recommendation']}"
+    ),
+
+    "feature_importance": feature_importance, 
+
+    "uncertainty": uncertainty["std"],
+
+    "mc_mean": uncertainty["mean"],
+
+    "mc_samples": uncertainty["samples"]
 
 }
+    save_prediction(prediction_result)
+    return prediction_result
 
 if __name__ == "__main__":
 

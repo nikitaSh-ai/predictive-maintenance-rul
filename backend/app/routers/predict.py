@@ -1,11 +1,15 @@
 from backend.app.services.model_service import MODEL_DIR
-from fastapi import APIRouter, UploadFile, File, HTTPException
+
 import pandas as pd
 
+import logging
+from fastapi import APIRouter, UploadFile, File, HTTPException
 import os
 import tempfile
 
 from src.pipeline.predict_engine import run_prediction
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -37,10 +41,26 @@ async def predict(file: UploadFile = File(...)):
 
     try:
 
-       result = run_prediction(temp_path)
+      result = run_prediction(temp_path)
 
-       return result
+      return result
+
+    except ValueError as error:
+
+       raise HTTPException(
+        status_code=400,
+        detail=str(error)
+      )
+
+    except Exception as error:
+
+      logger.exception("Prediction failed.")
+
+      raise HTTPException(
+        status_code=500,
+        detail="Prediction failed due to an internal error."
+       )
 
     finally:
 
-       os.remove(temp_path)
+      os.remove(temp_path)

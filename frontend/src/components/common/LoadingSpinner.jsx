@@ -1,4 +1,20 @@
-function LoadingSpinner() {
+function LoadingSpinner({
+
+    title = "AI is analyzing your engine...",
+
+    steps = [
+
+        "📂 Reading uploaded dataset",
+
+        "⚙ Creating time sequences",
+
+        "🧠 Running GRU model",
+
+        "🛠 Generating maintenance recommendation",
+
+    ],
+
+}) {
 
     return (
 
@@ -20,21 +36,23 @@ function LoadingSpinner() {
 
                 <h2 className="text-2xl font-bold mt-6">
 
-                    AI is analyzing your engine...
+    {title}
 
-                </h2>
+</h2>
 
                 <div className="mt-8 space-y-3 text-gray-600">
 
-                    <p>📂 Reading uploaded dataset</p>
+    {steps.map((step) => (
 
-                    <p>⚙ Creating time sequences</p>
+        <p key={step}>
 
-                    <p>🧠 Running GRU model</p>
+            {step}
 
-                    <p>🛠 Generating maintenance recommendation</p>
+        </p>
 
-                </div>
+    ))}
+
+</div>
 
             </div>
 

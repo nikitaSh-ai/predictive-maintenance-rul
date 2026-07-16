@@ -1,4 +1,10 @@
+import { useNavigate } from "react-router-dom";
+
+
+
 function PredictionCard({ prediction }) {
+
+    const navigate = useNavigate();
 
     if (!prediction) return null;
 
@@ -44,12 +50,17 @@ function PredictionCard({ prediction }) {
 
     const riskStyle = getRiskStyle(prediction.risk);
 
+    
+
     const engineCondition =
         prediction.risk === "Low"
             ? "Healthy"
             : prediction.risk === "Medium"
             ? "Degrading"
             : "Critical";
+
+
+  
 
     return (
 
@@ -83,7 +94,7 @@ function PredictionCard({ prediction }) {
                         text-blue-600
                     "
                 >
-                    {prediction.rul}
+                 {prediction.predicted_rul}
                 </h1>
 
                 <p className="text-xl text-gray-600">
@@ -98,7 +109,7 @@ function PredictionCard({ prediction }) {
 
             {/* ================= Metrics ================= */}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-10">
 
                 {/* Risk */}
 
@@ -186,6 +197,53 @@ function PredictionCard({ prediction }) {
                     </h3>
 
                 </div>
+
+                 {/* Uncertainty */}
+
+                 <div
+    className="
+        bg-purple-50
+        border
+        border-purple-200
+        rounded-xl
+        p-5
+    "
+>
+
+    <p className="text-gray-500">
+
+        Uncertainty
+
+    </p>
+
+    <p className="text-xs text-gray-400 mt-1">
+
+    Monte Carlo Dropout
+
+</p>
+
+
+
+    <h3
+        className="
+            text-2xl
+            font-bold
+            text-purple-600
+            mt-2
+        "
+    >
+
+        ±{prediction.uncertainty}
+        <p className="text-sm text-gray-500 mt-2">
+
+    cycles
+
+</p>
+
+    </h3>
+
+</div>
+
 
             </div>
 
@@ -318,8 +376,7 @@ function PredictionCard({ prediction }) {
         </span>
 
         <span className="font-semibold">
-
-            {prediction.rul} Cycles
+         {prediction.predicted_rul} Cycles
 
         </span>
 
@@ -356,6 +413,22 @@ function PredictionCard({ prediction }) {
         </span>
 
     </div>
+
+    <div className="flex justify-between">
+
+    <span className="text-gray-500">
+
+        ✓ Uncertainty
+
+    </span>
+
+    <span className="font-semibold">
+
+        ±{prediction.uncertainty} cycles
+
+    </span>
+
+</div>
 
     <div className="flex justify-between">
 
@@ -404,6 +477,36 @@ function PredictionCard({ prediction }) {
                 </p>
 
             </div>
+
+
+<div className="mt-8 flex justify-center">
+
+    <button
+        onClick={() =>
+            navigate(
+                "/decision-intelligence",
+                {
+                    state: prediction
+                }
+            )
+        }
+        className="
+            bg-blue-600
+            hover:bg-blue-700
+            text-white
+            font-semibold
+            px-8
+            py-3
+            rounded-xl
+            transition
+        "
+    >
+        View Decision Intelligence →
+    </button>
+
+</div>
+
+
 
         </div>
 

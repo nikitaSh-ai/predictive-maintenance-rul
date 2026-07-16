@@ -21,7 +21,7 @@ function App() {
         <Route path="/comparison" element={<MainLayout><ModelComparison /></MainLayout>} />
         <Route path="/explainability" element={<MainLayout><Explainability /></MainLayout>} />
         <Route path="/uncertainty" element={<MainLayout><Uncertainty /></MainLayout>} />
-        <Route path="/decision" element={<MainLayout><DecisionIntelligence /></MainLayout>} />
+        <Route path="/decision-intelligence" element={<MainLayout><DecisionIntelligence /></MainLayout>} />
         <Route path="/about" element={<MainLayout><About /></MainLayout>} />
       </Routes>
     </BrowserRouter>

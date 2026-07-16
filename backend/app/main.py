@@ -1,14 +1,26 @@
 import sys
+import logging
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2].parent
 sys.path.append(str(PROJECT_ROOT))
 
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+)
+
+
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from backend.app.routers.uncertainty import (
+    router as uncertainty_router
+)
 from backend.app.routers.predict import router as predict_router
+from backend.app.routers.explain import router as explain_router
+
 
 
 app = FastAPI(
@@ -38,6 +50,8 @@ app.add_middleware(
 )
 
 app.include_router(predict_router)
+app.include_router(explain_router)
+app.include_router(uncertainty_router)
 
 
 @app.get("/")

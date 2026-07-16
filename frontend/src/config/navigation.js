@@ -36,7 +36,7 @@ const navigation = [
   },
   {
     name: "Decision Intelligence",
-    path: "/decision",
+    path: "/decision-intelligence",
     icon: ShieldCheck,
   },
   {
