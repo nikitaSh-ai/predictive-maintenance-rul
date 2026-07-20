@@ -34,3 +34,22 @@ models/*.pth
 
 # Processed scaler
 DATA/processed/*.pkl
+
+
+
+# Generated data
+DATA/version2/sequences/
+
+# Trained models (if you don't want to version them)
+models/version2/
+
+# Generated results
+results/version2/
+
+# Uploaded files
+uploads/
+
+
+
+
+DATA/sequences/

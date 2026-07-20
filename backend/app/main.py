@@ -1,6 +1,7 @@
 import sys
 import logging
 from pathlib import Path
+from backend.app.routers import version2
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2].parent
 sys.path.append(str(PROJECT_ROOT))
@@ -52,7 +53,9 @@ app.add_middleware(
 app.include_router(predict_router)
 app.include_router(explain_router)
 app.include_router(uncertainty_router)
-
+app.include_router(
+    version2.router
+)
 
 @app.get("/")
 def root():

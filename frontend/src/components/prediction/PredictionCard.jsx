@@ -85,6 +85,10 @@ function PredictionCard({ prediction }) {
                 Prediction Result
             </h2>
 
+            <p className="text-center text-gray-500 mt-2">
+    Engine {prediction.engine_id}
+</p>
+
             <div className="mt-8 text-center">
 
                 <h1

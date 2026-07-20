@@ -1,6 +1,9 @@
 
 import { useState } from "react";
-import { predictRUL } from "../services/api";
+import {
+    predictRUL,
+    predictRULV2
+} from "../services/api";
 
 import FileUploadCard from "../components/common/FileUploadCard";
 import Button from "../components/common/Button";
@@ -16,7 +19,7 @@ function PredictRUL() {
     const [isLoading, setIsLoading] = useState(false);
     const [predictionResult, setPredictionResult] = useState(null);
     const [success, setSuccess] = useState("");
-   
+    const [modelVersion, setModelVersion] = useState("v2");
 
 
     
@@ -78,9 +81,13 @@ const handlePredict = async () => {
     setIsLoading(true);
     try {
 
-    const result = await predictRUL(selectedFile);
+    const result =
+    modelVersion === "v2"
+        ? await predictRULV2(selectedFile)
+        : await predictRUL(selectedFile);
 
     setPredictionResult({
+    engine_id: result.engine_id,
     predicted_rul: result.predicted_rul,
     risk: result.risk,
     priority: result.priority,
@@ -94,7 +101,13 @@ const handlePredict = async () => {
     reason: result.reason,
 });
 
-setSuccess("Prediction completed successfully.");
+setSuccess(
+    `Prediction completed successfully using ${
+        modelVersion === "v2"
+            ? "Version 2 (Generalized Model)"
+            : "Version 1 (FD001 Model)"
+    }.`
+);
 setTimeout(() => {
 
     setSuccess("");
@@ -161,6 +174,37 @@ setTimeout(() => {
                 </p>
 
             </div>
+
+
+            <div className="mt-6">
+    <label className="block text-sm font-medium mb-2">
+        Model Version
+    </label>
+
+    <select
+        value={modelVersion}
+        onChange={(e) => setModelVersion(e.target.value)}
+        className="
+            w-full
+            max-w-xs
+            border
+            rounded-lg
+            px-3
+            py-2
+            focus:outline-none
+            focus:ring-2
+            focus:ring-blue-500
+        "
+    >
+        <option value="v2">
+            Version 2 (Generalized)
+        </option>
+
+        <option value="v1">
+            Version 1 (FD001)
+        </option>
+    </select>
+</div>
 
            <FileUploadCard
     selectedFile={selectedFile}
