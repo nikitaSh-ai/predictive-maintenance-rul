@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 
 function PredictionCard({ prediction }) {
 
+    console.log(prediction);
+
     const navigate = useNavigate();
 
     if (!prediction) return null;
@@ -197,7 +199,7 @@ function PredictionCard({ prediction }) {
                             mt-2
                         "
                     >
-                        {prediction.healthScore}%
+                        {prediction.health_score}%
                     </h3>
 
                 </div>
@@ -237,7 +239,7 @@ function PredictionCard({ prediction }) {
         "
     >
 
-        ±{prediction.uncertainty}
+        ±{Number(prediction.uncertainty).toFixed(2)}
         <p className="text-sm text-gray-500 mt-2">
 
     cycles
@@ -428,7 +430,7 @@ function PredictionCard({ prediction }) {
 
     <span className="font-semibold">
 
-        ±{prediction.uncertainty} cycles
+        ±{Number(prediction.uncertainty).toFixed(2)} cycles
 
     </span>
 
@@ -444,7 +446,7 @@ function PredictionCard({ prediction }) {
 
         <span className="font-semibold">
 
-            {prediction.healthScore}%
+            {prediction.health_score}%
 
         </span>
 
@@ -483,35 +485,77 @@ function PredictionCard({ prediction }) {
             </div>
 
 
-<div className="mt-8 flex justify-center">
+<div className="mt-10">
 
-    <button
-        onClick={() =>
-            navigate(
-                "/decision-intelligence",
-                {
-                    state: prediction
-                }
-            )
-        }
-        className="
-            bg-blue-600
-            hover:bg-blue-700
-            text-white
-            font-semibold
-            px-8
-            py-3
-            rounded-xl
-            transition
-        "
-    >
-        View Decision Intelligence →
-    </button>
+    <h3 className="text-xl font-bold mb-4">
+        Analysis Tools
+    </h3>
+
+    <div className="flex flex-wrap gap-4">
+
+        {/* Decision Intelligence */}
+        <button
+            onClick={() =>
+                navigate("/engine-analysis", {
+                    state: prediction,
+                })
+            }
+            className="
+                bg-blue-600
+                hover:bg-blue-700
+                text-white
+                px-6
+                py-3
+                rounded-xl
+                font-semibold
+            "
+        >
+            📊 Decision Intelligence
+        </button>
+
+        {/* Explainability */}
+        <button
+            onClick={() =>
+                navigate("/explainability", {
+                    state: prediction,
+                })
+            }
+            className="
+                bg-green-600
+                hover:bg-green-700
+                text-white
+                px-6
+                py-3
+                rounded-xl
+                font-semibold
+            "
+        >
+            🧠 Explainability
+        </button>
+
+        {/* Uncertainty */}
+        <button
+            onClick={() =>
+                navigate("/uncertainty", {
+                    state: prediction,
+                })
+            }
+            className="
+                bg-purple-600
+                hover:bg-purple-700
+                text-white
+                px-6
+                py-3
+                rounded-xl
+                font-semibold
+            "
+        >
+            📈 Uncertainty
+        </button>
+
+    </div>
 
 </div>
-
-
-
         </div>
 
     );

@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+python-multipart
+
+numpy
+pandas
+scikit-learn
+joblib
+
+torch
+captum
+
+matplotlib
+
+pytest
+
+python-dotenv

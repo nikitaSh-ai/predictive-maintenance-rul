@@ -117,31 +117,6 @@ def evaluate_predictions(
 
 
 
-def predict_dataset(
-    model,
-    X,
-    device
-):
-    """
-    Predict one dataset.
-    """
-
-    model.eval()
-
-    with torch.no_grad():
-
-        X = torch.FloatTensor(X).to(device)
-
-        predictions = model(X)
-
-        predictions = (
-        predictions
-        .cpu()
-        .numpy()
-        .flatten()
-    )
-
-    return predictions
 
 
 def plot_actual_vs_predicted(
@@ -384,6 +359,9 @@ def main():
 
     results = {}
     prediction_results = {}
+    all_actual = []
+    
+    all_predicted = []
 
     for dataset in TEST_DATASETS:
 
@@ -399,15 +377,52 @@ def main():
         predictions)
       
 
-      prediction_results[dataset] = {
-    "actual": y,
-    "predicted": predictions
-}
+      prediction_results[dataset] = {"actual": y,"predicted": predictions}
+      prediction_df = pd.DataFrame({
+
+    "Actual_RUL": y,
+
+    "Predicted_RUL": predictions
+
+})
+
+      prediction_df.to_csv(
+
+    f"results/version2/{dataset}_predictions.csv",
+
+    index=False
+
+)
+
+
+      all_actual.extend(y)
+
+      all_predicted.extend(predictions)
 
       results[dataset] = (
         mae,
         rmse,
         r2)
+
+
+
+
+    overall_mae = mean_absolute_error(
+    all_actual,
+    all_predicted
+)
+
+    overall_rmse = np.sqrt(
+    mean_squared_error(
+        all_actual,
+        all_predicted
+    )
+)
+
+    overall_r2 = r2_score(
+    all_actual,
+    all_predicted
+)
       
     print()
 
@@ -428,17 +443,57 @@ def main():
       print(f"RMSE : {rmse:.4f}")
 
       print(f"R²   : {r2:.4f}")
+
+
+
+
+
+    print()
+
+    print("="*60)
+
+    print("OVERALL GENERALIZATION PERFORMANCE")
+
+    print("="*60)
+
+    print(f"MAE  : {overall_mae:.4f}")
+
+    print(f"RMSE : {overall_rmse:.4f}")
+
+    print(f"R²   : {overall_r2:.4f}")
     
 
-
+    
     results_df = pd.DataFrame(
-    {
-        "Dataset": list(results.keys()),
-        "MAE": [m[0] for m in results.values()],
-        "RMSE": [m[1] for m in results.values()],
-        "R2": [m[2] for m in results.values()]
-    })
+{
 
+    "Model": ["Version 2"] * len(results),
+
+    "Dataset": list(results.keys()),
+
+    "MAE": [m[0] for m in results.values()],
+
+    "RMSE": [m[1] for m in results.values()],
+
+    "R2": [m[2] for m in results.values()]
+
+}
+)
+
+
+    results_df.loc[len(results_df)] = [
+
+    "Version 2",
+
+    "Overall",
+
+    overall_mae,
+
+    overall_rmse,
+
+    overall_r2
+
+]
 
     os.makedirs(
     "results/version2",

@@ -50,8 +50,17 @@ SEQUENCE_LENGTH = 40
 EXPECTED_COLUMNS = 26
 
 
+EXPECTED_COLUMN_NAMES = [
+    "engine_id",
+    "cycle",
+    "op_setting_1",
+    "op_setting_2",
+    "op_setting_3",
+    *[f"sensor_{i}" for i in range(1, 22)],
+]
 
-def validate_dataset(df):
+
+def validate_dataset(df, is_csv=True):
     """
     Validate uploaded dataset.
     """
@@ -59,12 +68,26 @@ def validate_dataset(df):
     logger.info("Validating uploaded dataset.")
 
     if df.empty:
+        logger.error("Validation failed: Uploaded dataset is empty.")
         raise ValueError("Uploaded dataset is empty.")
 
     if df.shape[1] != EXPECTED_COLUMNS:
         raise ValueError(
             f"Expected {EXPECTED_COLUMNS} columns but found {df.shape[1]}."
         )
+
+
+    # Validate column names only for CSV uploads
+
+    if is_csv:
+
+        if list(df.columns) != EXPECTED_COLUMN_NAMES:
+
+            raise ValueError(
+            "Invalid dataset schema. Column names do not match the NASA C-MAPSS format."
+        )
+
+    
 
     try:
         df = df.apply(pd.to_numeric)
@@ -74,12 +97,125 @@ def validate_dataset(df):
     missing_values = df.isnull().sum().sum()
 
     if missing_values > 0:
+        logger.error(
+        f"Validation failed: Dataset contains {missing_values} missing values."
+    )
         raise ValueError(
             f"Dataset contains {missing_values} missing values."
         )
 
-    if len(df) < 1:
-        raise ValueError("Dataset must contain at least one cycle.")
+
+
+    # ----------------------------------
+    # Duplicate Row Validation
+    # ----------------------------------
+
+    duplicate_rows = df.duplicated().sum()
+
+    if duplicate_rows > 0:
+
+        logger.error(
+        f"Validation failed: {duplicate_rows} duplicate rows detected."
+    )
+
+        raise ValueError(
+        f"Dataset contains {duplicate_rows} duplicate row(s)."
+    )
+
+
+
+
+
+
+
+
+
+    # ----------------------------------
+    # Engine ID Validation
+    # ----------------------------------
+
+    if df["engine_id"].isnull().any():
+
+        raise ValueError(
+        "Engine ID column contains missing values."
+    )
+
+    if not pd.api.types.is_numeric_dtype(df["engine_id"]):
+
+        raise ValueError(
+        "Engine ID must contain numeric values only."
+    )
+
+    if (df["engine_id"] <= 0).any():
+
+        logger.error(
+        "Validation failed: Engine IDs must be positive integers."
+    )
+        raise ValueError(
+        "Engine IDs must be positive integers."
+    )
+
+    if (df["engine_id"] % 1 != 0).any():
+
+        raise ValueError(
+        "Engine IDs must be integers."
+    )
+
+
+    # ----------------------------------
+    # Cycle Ordering Validation
+    # ----------------------------------
+
+    for engine_id, engine_data in df.groupby("engine_id"):
+
+        if not engine_data["cycle"].is_monotonic_increasing:
+
+            logger.error(
+        f"Validation failed: Engine {engine_id} has unsorted cycle values."
+    )
+
+            raise ValueError(
+            f"Engine {engine_id} contains unsorted cycle values."
+        )
+
+
+
+
+
+    # ----------------------------------
+    # Duplicate Cycle Validation
+    # ----------------------------------
+
+    for engine_id, engine_data in df.groupby("engine_id"):
+
+        duplicate_cycles = engine_data["cycle"].duplicated().sum()
+
+        if duplicate_cycles > 0:
+
+            raise ValueError(
+            f"Engine {engine_id} contains {duplicate_cycles} duplicate cycle(s)."
+        )
+
+
+
+
+
+    # ----------------------------------
+    # Cycle Value Validation
+    # ----------------------------------
+
+    if (df["cycle"] <= 0).any():
+
+        raise ValueError(
+        "Cycle values must be greater than zero."
+    )
+
+    if (df["cycle"] % 1 != 0).any():
+
+        raise ValueError(
+        "Cycle values must be integers."
+    )
+
 
     logger.info("Dataset validation completed successfully.")
 
@@ -122,6 +258,9 @@ def extract_latest_sequence(engine_df):
     """
 
     engine_id = engine_df["engine_id"].iloc[0]
+    engine_df = engine_df.sort_values(
+    by="cycle"
+).reset_index(drop=True)
 
     logger.info(f"Processing Engine ID: {engine_id}")
     logger.info(f"Engine contains {len(engine_df)} cycle(s).")
@@ -225,7 +364,20 @@ def run_prediction_v2(csv_path: str) -> dict:
 
     if extension == ".csv":
 
-        df = pd.read_csv(csv_path)
+        column_names = [
+        "engine_id",
+        "cycle",
+        "op_setting_1",
+        "op_setting_2",
+        "op_setting_3",
+        *[f"sensor_{i}" for i in range(1, 22)],
+    ]
+
+        df = pd.read_csv(
+        csv_path,
+        header=None,
+        names=column_names,
+    )
 
     elif extension == ".txt":
 
@@ -253,43 +405,49 @@ def run_prediction_v2(csv_path: str) -> dict:
     logger.info("Dataset loaded successfully.")
 
     # Validate uploaded dataset
-    validate_dataset(df)
+    validate_dataset(
+    df,
+    is_csv=(extension == ".csv")
+)
 
     # Split into individual engines
     engines = split_by_engine(df)
 
-    # Use the first engine for prediction
-    first_engine = next(iter(engines.values()))
+    predictions = []
 
-    engine_id = int(first_engine["engine_id"].iloc[0])
+    for engine_df in engines.values():
 
-    # Extract the latest sequence
-    sequence = extract_latest_sequence(first_engine)
+        engine_id = int(
+        engine_df["engine_id"].iloc[0]
+    )
 
-    # Apply Version 2 preprocessing
-    processed_sequence = preprocess_sequence(sequence)
+        # Extract the latest sequence
+        sequence = extract_latest_sequence(engine_df)
+
+        # Apply Version 2 preprocessing
+        processed_sequence = preprocess_sequence(sequence)
     
 
-    logger.info(f"Processed sequence shape: {processed_sequence.shape}")
+        logger.info(f"Processed sequence shape: {processed_sequence.shape}")
 
 
-    logger.info("Input sequence preprocessed successfully.")
+        logger.info("Input sequence preprocessed successfully.")
 
 
-    # Predict RUL with uncertainty
-    prediction_result = predict_with_uncertainty(
+        # Predict RUL with uncertainty
+        prediction_result = predict_with_uncertainty(
         processed_sequence.squeeze(0).numpy()
     )
 
-    logger.info(
-    f"Predicted RUL: {prediction_result['predicted_rul']}"
+        logger.info(
+        f"Predicted RUL: {prediction_result['predicted_rul']}"
 )
 
-    logger.info(
-    f"Uncertainty: {prediction_result['uncertainty']}"
+        logger.info(
+        f"Uncertainty: {prediction_result['uncertainty']}"
 )
 
-    predicted_rul = min(
+        predicted_rul = min(
     125.0,
     max(
         0.0,
@@ -297,61 +455,61 @@ def run_prediction_v2(csv_path: str) -> dict:
     )
 )
 
-    uncertainty_std = prediction_result["uncertainty"]
+        uncertainty_std = prediction_result["uncertainty"]
 
-    decision = prediction_result["decision"]
+        decision = prediction_result["decision"]
 
-    logger.info(
+        logger.info(
         f"Prediction completed. RUL: {predicted_rul:.2f}"
     )
 
 
 
-    # Generate Integrated Gradients feature importance
-    feature_importance = generate_attributions(
+        # Generate Integrated Gradients feature importance
+        feature_importance = generate_attributions(
         MODEL,
         processed_sequence
     )
 
-    logger.info("Feature importance generated successfully.")
+        logger.info("Feature importance generated successfully.")
 
     
 
-    # Calculate health score
-    health_score = min(
+        # Calculate health score
+        health_score = min(
         round((predicted_rul / 125) * 100),
         100
     )
 
-    # Determine risk level
-    if predicted_rul <= 15:
-        risk = "Critical"
-    elif predicted_rul <= 40:
-        risk = "High"
-    elif predicted_rul <= 80:
-        risk = "Medium"
-    else:
-        risk = "Low"
+        # Determine risk level
+        if predicted_rul <= 15:
+            risk = "Critical"
+        elif predicted_rul <= 40:
+            risk = "High"
+        elif predicted_rul <= 80:
+            risk = "Medium"
+        else:
+            risk = "Low"
 
-    # Calculate confidence
-    if uncertainty_std < 1:
-        confidence = 98
-    elif uncertainty_std < 2:
-        confidence = 95
-    elif uncertainty_std < 3:
-        confidence = 90
-    elif uncertainty_std < 5:
-        confidence = 80
-    else:
-        confidence = 70
+        # Calculate confidence
+        if uncertainty_std < 1:
+            confidence = 98
+        elif uncertainty_std < 2:
+            confidence = 95
+        elif uncertainty_std < 3:
+            confidence = 90
+        elif uncertainty_std < 5:
+            confidence = 80
+        else:
+            confidence = 70
 
-    logger.info(
+        logger.info(
         f"Risk: {risk}, Confidence: {confidence}%"
     )
 
 
 
-    response = {
+        response = {
 
         "engine_id": engine_id,
 
@@ -386,10 +544,18 @@ def run_prediction_v2(csv_path: str) -> dict:
         "mc_samples": prediction_result["mc_samples"],
 
         "mc_mean": predicted_rul
-    }
+        }
 
-    save_prediction(response)
+        predictions.append(response)
+
+        save_prediction(response)
+
+
+    
 
     logger.info("Prediction pipeline completed successfully.")
 
-    return response
+    return {
+    "total_engines": len(predictions),
+    "predictions": predictions
+}

@@ -8,6 +8,7 @@ import Uncertainty from "./pages/Uncertainty";
 import DecisionIntelligence from "./pages/DecisionIntelligence";
 import About from "./pages/About";
 
+import EngineAnalysis from "./pages/EngineAnalysis";
 
 
 import MainLayout from "./layouts/MainLayout";
@@ -23,6 +24,20 @@ function App() {
         <Route path="/uncertainty" element={<MainLayout><Uncertainty /></MainLayout>} />
         <Route path="/decision-intelligence" element={<MainLayout><DecisionIntelligence /></MainLayout>} />
         <Route path="/about" element={<MainLayout><About /></MainLayout>} />
+        <Route
+    path="/engine-analysis"
+    element={<EngineAnalysis />}
+/>
+   <Route
+    path="/explainability"
+    element={<Explainability />}
+/>
+
+   <Route
+    path="/uncertainty"
+    element={<Uncertainty />}
+/>
+
       </Routes>
     </BrowserRouter>
   );

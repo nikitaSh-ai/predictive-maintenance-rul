@@ -1,3 +1,5 @@
+
+
 function ModelComparison() {
 
     return (
@@ -123,21 +125,21 @@ function ModelComparison() {
         <p className="mt-4">
 
             MAE:
-            <strong> 0.0374</strong>
+            <strong> 9.9226</strong>
 
         </p>
 
         <p className="mt-2">
 
             RMSE:
-            <strong> 0.0497</strong>
+            <strong> 13.1468</strong>
 
         </p>
 
         <p className="mt-2">
 
             R²:
-            <strong> Coming Soon</strong>
+            <strong> 0.9019</strong>
 
         </p>
 
@@ -170,21 +172,21 @@ function ModelComparison() {
         <p className="mt-4">
 
             MAE:
-            <strong> 0.1066</strong>
+            <strong> 15.4379</strong>
 
         </p>
 
         <p className="mt-2">
 
             RMSE:
-            <strong> 0.1402</strong>
+            <strong> 18.5739</strong>
 
         </p>
 
         <p className="mt-2">
 
             R²:
-            <strong> Coming Soon</strong>
+            <strong> 0.8042</strong>
 
         </p>
 
@@ -215,27 +217,23 @@ function ModelComparison() {
         </h3>
 
         <p className="mt-4">
+    MAE:
+    <strong> 13.4806</strong>
+</p>
 
-            MAE:
-            <strong> Coming Soon</strong>
+<p className="mt-2">
+    RMSE:
+    <strong> 16.7643</strong>
+</p>
 
-        </p>
+<p className="mt-2">
+    R²:
+    <strong> 0.8398</strong>
+</p>
 
-        <p className="mt-2">
-
-            RMSE:
-            <strong> Coming Soon</strong>
-
-        </p>
-
-        <p className="mt-2">
-
-            R²:
-            <strong> Coming Soon</strong>
-
-        </p>
 
     </div>
+
 
 </div>
 
@@ -314,19 +312,19 @@ function ModelComparison() {
 
                 <td className="px-6 py-4 text-center">
 
-                    0.0374
+                    9.9226
 
                 </td>
 
                 <td className="px-6 py-4 text-center">
 
-                    0.1066
+                    15.4379
 
                 </td>
 
                 <td className="px-6 py-4 text-center">
 
-                    Coming Soon
+                    13.4806
 
                 </td>
 
@@ -342,19 +340,19 @@ function ModelComparison() {
 
                 <td className="px-6 py-4 text-center">
 
-                    0.0497
+                    13.1468
 
                 </td>
 
                 <td className="px-6 py-4 text-center">
 
-                    0.1402
+                    18.5739
 
                 </td>
 
                 <td className="px-6 py-4 text-center">
 
-                    Coming Soon
+                    16.7643
 
                 </td>
 
@@ -370,19 +368,19 @@ function ModelComparison() {
 
                 <td className="px-6 py-4 text-center">
 
-                    Coming Soon
+                    0.9019
 
                 </td>
 
                 <td className="px-6 py-4 text-center">
 
-                    Coming Soon
+                    0.8042
 
                 </td>
 
                 <td className="px-6 py-4 text-center">
 
-                    Coming Soon
+                    0.8398
 
                 </td>
 
@@ -407,6 +405,7 @@ function ModelComparison() {
     Performance Visualization
 
 </h2>
+
 
 <div
     className="
@@ -441,7 +440,7 @@ function ModelComparison() {
 
         <span>
 
-            0.0374
+            9.9226
 
         </span>
 
@@ -462,7 +461,7 @@ function ModelComparison() {
                 h-4
                 rounded-full
             "
-            style={{ width: "25%" }}
+            style={{ width: "53%" }}
         />
 
     </div>
@@ -483,7 +482,7 @@ function ModelComparison() {
 
         <span>
 
-            0.1066
+            15.4379
 
         </span>
 
@@ -504,7 +503,7 @@ function ModelComparison() {
                 h-4
                 rounded-full
             "
-            style={{ width: "70%" }}
+            style={{ width: "100%" }}
         />
 
     </div>
@@ -524,7 +523,7 @@ function ModelComparison() {
 
         <span>
 
-            Coming Soon
+            13.4806
 
         </span>
 
@@ -545,7 +544,7 @@ function ModelComparison() {
                 h-4
                 rounded-full
             "
-            style={{ width: "0%" }}
+            style={{ width: "73%" }}
         />
 
     </div>
@@ -592,7 +591,7 @@ function ModelComparison() {
 
         <span>
 
-            0.0497
+            13.1468
 
         </span>
 
@@ -613,7 +612,7 @@ function ModelComparison() {
                 h-4
                 rounded-full
             "
-            style={{ width: "30%" }}
+            style={{ width: "71%" }}
         />
 
     </div>
@@ -632,7 +631,7 @@ function ModelComparison() {
 
         <span>
 
-            0.1402
+            18.5739
 
         </span>
 
@@ -653,7 +652,7 @@ function ModelComparison() {
                 h-4
                 rounded-full
             "
-            style={{ width: "80%" }}
+            style={{ width: "100%" }}
         />
 
     </div>
@@ -671,7 +670,7 @@ function ModelComparison() {
 
         <span>
 
-            Coming Soon
+            16.7643
 
         </span>
 
@@ -692,13 +691,195 @@ function ModelComparison() {
                 h-4
                 rounded-full
             "
-            style={{ width: "0%" }}
+            style={{ width: "90%" }}
         />
 
     </div>
 
 </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div
+    className="
+        mt-8
+        bg-white
+        border
+        rounded-xl
+        shadow
+        p-6
+    "
+>
+
+    <h3
+        className="
+            text-xl
+            font-semibold
+            mb-6
+        "
+    >
+
+        R² Score (Higher is Better)
+
+    </h3>
+
+
+
+<div className="mb-6">
+
+    <div className="flex justify-between mb-2">
+
+        <span className="font-medium">
+
+            GRU
+
+        </span>
+
+        <span>
+
+            0.9019
+
+        </span>
+
+    </div>
+
+    <div
+        className="
+            w-full
+            bg-gray-200
+            rounded-full
+            h-4
+        "
+    >
+
+        <div
+            className="
+                bg-blue-600
+                h-4
+                rounded-full
+            "
+            style={{ width: "100%" }}
+        />
+
+    </div>
+
+</div>
+
+<div className="mb-6">
+
+    <div className="flex justify-between mb-2">
+
+        <span className="font-medium">
+
+            Random Forest
+
+        </span>
+
+        <span>
+
+            0.8042
+
+        </span>
+
+    </div>
+
+    <div
+        className="
+            w-full
+            bg-gray-200
+            rounded-full
+            h-4
+        "
+    >
+
+        <div
+            className="
+                bg-green-600
+                h-4
+                rounded-full
+            "
+            style={{ width: "93%" }}
+        />
+
+    </div>
+
+</div>
+<div>
+
+    <div className="flex justify-between mb-2">
+
+        <span className="font-medium">
+
+            XGBoost
+
+        </span>
+
+        <span>
+
+            0.8398
+
+        </span>
+
+    </div>
+
+    <div
+        className="
+            w-full
+            bg-gray-200
+            rounded-full
+            h-4
+        "
+    >
+
+        <div
+            className="
+                bg-orange-500
+                h-4
+                rounded-full
+            "
+            style={{ width: "89%" }}
+        />
+
+    </div>
+
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 <div

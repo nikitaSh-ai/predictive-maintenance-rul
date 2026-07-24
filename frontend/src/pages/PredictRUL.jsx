@@ -1,5 +1,7 @@
-
+import ConfirmationDialog from "../components/common/ConfirmationDialog";
 import { useState } from "react";
+import { useContext } from "react";
+import { PredictionContext } from "../context/PredictionContext";
 import {
     predictRUL,
     predictRULV2
@@ -9,24 +11,47 @@ import FileUploadCard from "../components/common/FileUploadCard";
 import Button from "../components/common/Button";
 import PredictionCard from "../components/prediction/PredictionCard";
 import LoadingSpinner from "../components/common/LoadingSpinner";
-
-
+import FleetSummary from "../components/prediction/FleetSummary";
+import EngineTable from "../components/prediction/EngineTable";
 
 function PredictRUL() {
 
-    const [selectedFile, setSelectedFile] = useState(null);
-    const [error, setError] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
-    const [predictionResult, setPredictionResult] = useState(null);
-    const [success, setSuccess] = useState("");
-    const [modelVersion, setModelVersion] = useState("v2");
+    const {
 
+    predictionResults,
+    setPredictionResults,
+
+    selectedEngine,
+    setSelectedEngine,
+
+    selectedFile,
+    setSelectedFile,
+
+    modelVersion,
+    setModelVersion
+
+    } = useContext(PredictionContext);
 
     
+    const [error, setError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    
+    const [success, setSuccess] = useState("");
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
     const handleFileChange = (event) => {
 
+        
+
     const file = event.target.files[0];
+
+    setPredictionResults([]);
+
+setSelectedEngine(null);
+
+setSuccess("");
+
+setError("");
 
     if (!file) return;
     const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -60,10 +85,27 @@ function PredictRUL() {
     }
 
     setError("");
-
     setSelectedFile(file);
+};
+
+
+
+
+const handleChooseDataset = () => {
+
+    if (selectedFile) {
+
+        setShowConfirmDialog(true);
+
+    } else {
+
+        document.getElementById("engine-file").click();
+
+    }
 
 };
+
+
 
 
 const handlePredict = async () => {
@@ -80,28 +122,21 @@ const handlePredict = async () => {
 
     setIsLoading(true);
     try {
-
+console.log(selectedFile);
+console.log(selectedFile instanceof File);
     const result =
     modelVersion === "v2"
         ? await predictRULV2(selectedFile)
         : await predictRUL(selectedFile);
 
-    setPredictionResult({
-    engine_id: result.engine_id,
-    predicted_rul: result.predicted_rul,
-    risk: result.risk,
-    priority: result.priority,
-    confidence: result.confidence,
-    healthScore: result.health_score,
-    recommendation: result.recommendation,
-    inspection: result.inspection,
-    focus: result.focus,
-    summary: result.summary,
-    uncertainty: result.uncertainty,
-    reason: result.reason,
-});
+    
+    console.log(result.predictions[0]);
 
-setSuccess(
+
+    setPredictionResults(result.predictions);
+
+
+    setSuccess(
     `Prediction completed successfully using ${
         modelVersion === "v2"
             ? "Version 2 (Generalized Model)"
@@ -210,7 +245,12 @@ setTimeout(() => {
     selectedFile={selectedFile}
     onChange={handleFileChange}
     error={error}
+    predictionResults={predictionResults}
+    modelVersion={modelVersion}
+    onChooseDataset={handleChooseDataset}
 />
+
+
             <Button
     onClick={handlePredict}
     disabled={isLoading}
@@ -226,16 +266,56 @@ setTimeout(() => {
 {
     isLoading && <LoadingSpinner />
 }
-{
-    predictionResult && (
+  {
+    predictionResults.length > 0 && (
 
+        <>
+<FleetSummary
+    predictions={predictionResults}
+/>
+
+{
+    selectedEngine && (
         <PredictionCard
-            prediction={predictionResult}
+            prediction={selectedEngine}
         />
+    )
+}
+
+<EngineTable
+    predictions={predictionResults}
+    onView={(engine) => {
+        console.log(engine);
+        setSelectedEngine(engine);
+    }}
+/>
+          
+        </>
 
     )
 }
-        </div>
+
+
+
+<ConfirmationDialog
+    open={showConfirmDialog}
+    title="Change Active Dataset?"
+    message="Changing the dataset will clear the current prediction session."
+    itemName={selectedFile?.name}
+    confirmText="Change Dataset"
+    cancelText="Cancel"
+    onCancel={() => setShowConfirmDialog(false)}
+    onConfirm={() => {
+
+    setShowConfirmDialog(false);
+
+    document.getElementById("engine-file").click();
+
+}}
+/>
+
+
+  </div>
 
     );
 

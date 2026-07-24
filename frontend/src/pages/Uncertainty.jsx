@@ -6,9 +6,12 @@ import LoadingSpinner from "../components/common/LoadingSpinner";
 
 import ErrorCard from "../components/common/ErrorCard";
 
+import { useLocation } from "react-router-dom";
+
 function Uncertainty() {
 
-  
+  const { state: prediction } = useLocation();
+
   const [uncertaintyData, setUncertaintyData] = useState(null);
 
   const [loading, setLoading] = useState(true);
@@ -86,7 +89,7 @@ const predictionStability =
         ? "Moderate"
         : "Low";
 
-
+if (!prediction) return <h2>No prediction selected.</h2>;
 return (
 
     <div className="p-8">

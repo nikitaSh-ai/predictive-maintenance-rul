@@ -2,6 +2,7 @@ import sys
 import logging
 from pathlib import Path
 from backend.app.routers import version2
+from backend.app.database.database import initialize_database
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2].parent
 sys.path.append(str(PROJECT_ROOT))
@@ -33,6 +34,8 @@ app = FastAPI(
     version="1.0.0",
 
 )
+
+initialize_database()
 
 app.add_middleware(
 

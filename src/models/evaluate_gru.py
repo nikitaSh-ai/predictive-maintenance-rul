@@ -304,6 +304,35 @@ def main():
     print(f"R2   : {r2:.4f}")
 
 
+
+
+    results_df = pd.DataFrame({
+
+    "Dataset": ["FD001"],
+
+    "Model": ["Version 1"],
+
+    "MAE": [mae],
+
+    "RMSE": [rmse],
+
+    "R2": [r2]
+
+})
+
+    results_df.to_csv(
+
+    "results/version1_results.csv",
+
+    index=False
+
+)
+
+    print()
+
+    print("Version 1 results saved successfully.")
+
+
 if __name__ == "__main__":
     main()
 

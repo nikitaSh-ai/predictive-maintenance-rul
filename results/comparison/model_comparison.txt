@@ -1,0 +1,45 @@
+MODEL COMPARISON REPORT
+============================================================
+
+Version 1 (FD001 Only)
+----------------------------------------
+Dataset : FD001
+MAE     : 9.9226
+RMSE    : 13.1468
+R2      : 0.9019
+
+Version 2 (Generalized Model)
+----------------------------------------
+FD001
+MAE  : 10.5396
+RMSE : 15.1605
+R2   : 0.8643
+
+FD002
+MAE  : 11.9981
+RMSE : 16.7387
+R2   : 0.8351
+
+FD003
+MAE  : 9.6057
+RMSE : 14.0348
+R2   : 0.8864
+
+FD004
+MAE  : 10.0807
+RMSE : 15.9348
+R2   : 0.8506
+
+Overall
+MAE  : 10.6443
+RMSE : 15.8232
+R2   : 0.8574
+
+
+============================================================
+Conclusion
+============================================================
+
+Version 1 is specialized for the NASA FD001 operating condition and achieves the best performance on that dataset.
+
+Version 2 is designed for generalized Remaining Useful Life estimation across FD001, FD002, FD003, and FD004. Although its FD001 accuracy is slightly lower than the specialized model, it provides consistent performance across multiple operating conditions, making it suitable for real world predictive maintenance applications.

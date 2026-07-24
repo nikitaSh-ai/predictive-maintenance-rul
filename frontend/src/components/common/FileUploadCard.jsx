@@ -1,13 +1,39 @@
 import { useState } from "react";
 import { UploadCloud } from "lucide-react";
 
+
+
 function FileUploadCard({
     selectedFile,
     onChange,
     error,
+    predictionResults = [],
+    modelVersion,
+    onChooseDataset,
+    onConfirmReplace,
 }) {
-
+   
     const [isDragging, setIsDragging] = useState(false);
+
+    
+    
+
+
+    const formatFileSize = (bytes) => {
+
+    if (bytes < 1024 * 1024) {
+
+        return `${(bytes / 1024).toFixed(1)} KB`;
+
+    }
+
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+
+};
+
+
+
+
 
     return (
 
@@ -102,6 +128,7 @@ function FileUploadCard({
 
 </div>
             <input
+              
                 id="engine-file"
                 type="file"
                 accept=".csv,.txt"
@@ -115,8 +142,9 @@ function FileUploadCard({
                 className="hidden"
             />
 
-            <label
-                htmlFor="engine-file"
+            <button
+    type="button"
+    onClick={onChooseDataset}
                 className="
                     inline-block
                     bg-blue-600
@@ -133,19 +161,11 @@ function FileUploadCard({
                 "
             >
 
-                Choose File
+                {selectedFile ? "Replace Dataset" : "Choose File"}
 
-            </label>
+            </button>
 
-            {!selectedFile && (
-
-                <p className="mt-4 text-gray-500">
-
-                    No file selected
-
-                </p>
-
-            )}
+            
 
 
             {error && (
@@ -174,41 +194,160 @@ function FileUploadCard({
             {selectedFile && (
 
                 <div
-                    className="
-                        mt-6
-                        bg-blue-50
-                        rounded-lg
-                        p-4
-                    "
-                >
+    className="
+        mt-6
+        bg-gradient-to-r
+        from-blue-50
+        to-cyan-50
+        border
+        border-blue-200
+        rounded-xl
+        p-6
+    "
+>
 
-                    <p className="font-medium text-blue-700">
+                    <div className="flex items-center justify-between">
 
-                        ✅ Selected File
+    <div>
 
-                    </p>
+        <p className="text-sm font-semibold text-blue-600 uppercase">
 
-                    <p className="font-semibold text-gray-800 mt-1">
+            Active Dataset
 
-                        {selectedFile.name}
+        </p>
 
-                    </p>
+        <h3 className="text-xl font-bold text-gray-800 mt-1">
 
-                    <p className="text-sm text-gray-600 mt-2">
+            📄 {selectedFile.name}
 
-                        Type : {selectedFile.type || "Unknown"}
+        </h3>
 
-                    </p>
+    </div>
 
-                    <p className="text-sm text-gray-600">
+    <div
+        className="
+            px-3
+            py-1
+            rounded-full
+            bg-green-100
+            text-green-700
+            text-sm
+            font-semibold
+        "
+    >
 
-                        Size : {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
+        Prediction Ready
 
-                    </p>
+    </div>
+
+</div>
+
+                    <div
+    className="
+        grid
+        grid-cols-1
+        md:grid-cols-3
+        gap-4
+        mt-6
+    "
+>
+
+    <div>
+
+        <p className="text-xs text-gray-500 uppercase">
+
+            Model
+
+        </p>
+
+        <p className="font-semibold">
+    {modelVersion === "v2"
+        ? "Generalized GRU (V2)"
+        : "GRU (Version 1)"}
+</p>
+
+    </div>
+
+    <div>
+
+        <p className="text-xs text-gray-500 uppercase">
+
+            File Type
+
+        </p>
+
+        <p className="font-semibold">
+
+            {selectedFile.type || "TXT / CSV"}
+
+        </p>
+
+    </div>
+
+    <div>
+
+        <p className="text-xs text-gray-500 uppercase">
+
+            Size
+
+        </p>
+
+        <p className="font-semibold">
+
+            {formatFileSize(selectedFile.size)}
+
+        </p>
+
+    </div>
+
+</div>
+
+                    <div
+    className="
+        mt-6
+        flex
+        flex-wrap
+        items-center
+        justify-between
+        gap-4
+        pt-4
+        border-t
+    "
+>
+
+    <div className="text-sm text-gray-600">
+
+        {predictionResults.length > 0
+            ? `${predictionResults.length} engine(s) analyzed`
+            : "Prediction not executed"}
+
+    </div>
+
+    <button
+    type="button"
+    onClick={onChooseDataset}
+    className="
+        cursor-pointer
+        bg-blue-600
+        hover:bg-blue-700
+        text-white
+        px-5
+        py-2
+        rounded-lg
+        font-medium
+        transition
+    "
+>
+    Change Dataset
+</button>
+
+</div>
 
                 </div>
 
             )}
+
+            
 
         </div>
 
