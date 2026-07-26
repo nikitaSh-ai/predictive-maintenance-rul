@@ -5,11 +5,19 @@ export const PredictionContext = createContext();
 export function PredictionProvider({ children }) {
 
     const [predictionResults, setPredictionResults] = useState(() => {
-      return JSON.parse(localStorage.getItem("predictionResults")) || [];
+      try {
+        return JSON.parse(localStorage.getItem("predictionResults")) || [];
+      } catch {
+        return [];
+      }
     });
 
     const [selectedEngine, setSelectedEngine] = useState(() => {
-      return JSON.parse(localStorage.getItem("selectedEngine")) || null;
+      try {
+        return JSON.parse(localStorage.getItem("selectedEngine")) || null;
+      } catch {
+        return null;
+      }
     });
 
     
