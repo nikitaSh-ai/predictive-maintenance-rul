@@ -53,3 +53,13 @@ uploads/
 
 
 DATA/sequences/
+
+
+
+
+__pycache__/
+*.pyc
+
+
+
+*.db

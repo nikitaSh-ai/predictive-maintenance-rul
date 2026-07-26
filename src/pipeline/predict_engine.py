@@ -427,6 +427,8 @@ def run_prediction(csv_path):
 
     prediction_result = {
 
+    "engine_id": int(first_engine["engine_id"].iloc[0]),
+
     "predicted_rul": predicted_rul,
 
     "risk": risk,

@@ -1,29 +1,21 @@
-import { useEffect, useState } from "react";
-
+import { useEffect, useState, useContext } from "react";
+import { useLocation } from "react-router-dom";
 import ErrorCard from "../components/common/ErrorCard";
-
 import { getExplainability } from "../services/api";
-
 import LoadingSpinner from "../components/common/LoadingSpinner";
-
-
 import FeatureImportanceCard from "../components/explainability/FeatureImportanceCard";
-
-function Explainability() {
-
-    const [featureImportance, setFeatureImportance] = useState({});
-
+import { PredictionContext } from "../context/PredictionContext";
+function Explainability(){
+    const { state: locationPrediction } = useLocation();
+    const { selectedEngine } = useContext(PredictionContext);
+    const prediction = locationPrediction || selectedEngine;
+    const [featureImportance, setFeatureImportance]= useState({});
     const [loading, setLoading] = useState(true);
-
     const [error, setError] = useState("");
-
     useEffect(() => {
-
         async function fetchExplainability() {
-
             try {
-
-const data = await getExplainability();
+const data = await getExplainability(prediction?.engine_id);
 
 if (!data.feature_importance) {
 
@@ -57,9 +49,7 @@ setError(
         }
 
         fetchExplainability();
-
-    }, []);
-
+    }, [prediction]);
 
    return (
 

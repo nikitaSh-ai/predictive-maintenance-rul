@@ -77,23 +77,25 @@ export const predictRULV2 = async (file) => {
 export default api;
 
 
-export const getExplainability = async () => {
-
+export const getExplainability = async (engineId) => {
     const response = await api.get(
-        "/explain"
+        "/explain",
+        {
+            params: engineId
+                ? { engine_id: engineId }
+                : {},
+        }
     );
-
     return response.data;
-
 };
-
-
-export const getUncertainty = async () => {
-
+export const getUncertainty = async (engineId) => {
     const response = await api.get(
-        "/uncertainty"
+        "/uncertainty",
+        {
+            params: engineId
+                ? { engine_id: engineId }
+                : {},
+        }
     );
-
     return response.data;
-
 };

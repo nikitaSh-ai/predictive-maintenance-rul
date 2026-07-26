@@ -28,10 +28,10 @@ function Sidebar({
                 : "-translate-x-full"
         }
 
-        md:translate-x-0
-        md:static
-        md:flex
-        md:flex-col
+        lg:translate-x-0
+lg:static
+lg:flex
+lg:flex-col
     `}
 >
 <div
@@ -59,7 +59,7 @@ function Sidebar({
 <button
     onClick={() => setSidebarOpen(false)}
     className="
-        md:hidden
+        lg:hidden
         p-2
         rounded-lg
         hover:bg-gray-100
@@ -83,10 +83,10 @@ function Sidebar({
               key={item.path}
               to={item.path}
                onClick={() => {
-        if (window.innerWidth < 768) {
-            setSidebarOpen(false);
-        }
-    }}
+    if (window.innerWidth < 1024) {
+        setSidebarOpen(false);
+    }
+}}
               className={({ isActive }) =>
 `
 flex items-center

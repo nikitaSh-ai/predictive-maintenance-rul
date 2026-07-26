@@ -86,3 +86,88 @@ def test_duplicate_rows():
     with pytest.raises(ValueError):
 
         validate_dataset(df)
+
+
+
+
+
+
+
+
+
+def test_missing_values():
+
+    df = create_valid_dataframe()
+
+    df.loc[0, "sensor_2"] = None
+
+    with pytest.raises(ValueError):
+
+        validate_dataset(df)
+
+
+
+
+def test_non_numeric_values():
+
+    df = create_valid_dataframe()
+
+    df["sensor_2"] = df["sensor_2"].astype(object)
+
+    df.loc[0, "sensor_2"] = "abc"
+
+    with pytest.raises(ValueError):
+
+        validate_dataset(df)
+
+
+
+def test_invalid_engine_id():
+
+    df = create_valid_dataframe()
+
+    df.loc[0, "engine_id"] = -1
+
+    with pytest.raises(ValueError):
+
+        validate_dataset(df)
+
+
+
+
+
+def test_invalid_column_count():
+
+    df = create_valid_dataframe()
+
+    df = df.drop(columns=["sensor_21"])
+
+    with pytest.raises(ValueError):
+
+        validate_dataset(df)
+
+
+
+
+def test_negative_cycle():
+
+    df = create_valid_dataframe()
+
+    df.loc[0, "cycle"] = -5
+
+    with pytest.raises(ValueError):
+
+        validate_dataset(df)
+
+
+
+
+def test_unsorted_cycles():
+
+    df = create_valid_dataframe()
+
+    df["cycle"] = [1, 3, 2]
+
+    with pytest.raises(ValueError):
+
+        validate_dataset(df)

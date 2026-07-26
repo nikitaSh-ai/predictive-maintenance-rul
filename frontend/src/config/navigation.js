@@ -6,6 +6,8 @@ import {
   Activity,
   ShieldCheck,
   Info,
+  FlaskConical,
+  Gauge,
 } from "lucide-react";
 
 const navigation = [
@@ -39,6 +41,19 @@ const navigation = [
     path: "/decision-intelligence",
     icon: ShieldCheck,
   },
+
+  {
+    name: "Engine Analysis",
+    path: "/engine-analysis",
+    icon: Gauge,
+  },
+
+  {
+    name: "Research Evolution",
+    path: "/research-evolution",
+    icon: FlaskConical,
+  },
+
   {
     name: "About",
     path: "/about",

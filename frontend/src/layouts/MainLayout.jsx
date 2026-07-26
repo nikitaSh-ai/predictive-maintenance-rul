@@ -16,7 +16,7 @@ function MainLayout({ children }) {
 
             <Navbar />
 
-            <div className="flex flex-1 overflow-hidden flex-col md:flex-row">
+            <div className="flex flex-1 overflow-hidden flex-col lg:flex-row">
 
 
 {
@@ -27,7 +27,7 @@ function MainLayout({ children }) {
                 inset-0
                 bg-black/40
                 z-40
-                md:hidden
+                lg:hidden
             "
             onClick={() => setSidebarOpen(false)}
         />
@@ -40,7 +40,7 @@ function MainLayout({ children }) {
 <button
     onClick={() => setSidebarOpen(true)}
     className="
-        md:hidden
+        lg:hidden
         m-4
         w-fit
         p-2

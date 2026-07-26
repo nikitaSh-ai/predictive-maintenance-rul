@@ -5,32 +5,38 @@ Store the latest prediction results
 for dashboard pages.
 """
 from backend.app.database.database import get_connection
-LATEST_PREDICTION = {}
 
+PREDICTIONS_BY_ENGINE = {}
+LATEST_ENGINE_ID = None
 
 def save_prediction(prediction):
     """
-    Save the latest prediction
+    Save the prediction for its specific engine,
     and store it in the database.
     """
+    global LATEST_ENGINE_ID
 
-    global LATEST_PREDICTION
-
-    LATEST_PREDICTION = prediction
+    PREDICTIONS_BY_ENGINE[prediction["engine_id"]] = prediction
+    LATEST_ENGINE_ID = prediction["engine_id"]
 
     save_prediction_to_database(
         prediction
     )
 
-
-def get_latest_prediction():
+def get_latest_prediction(engine_id=None):
     """
-    Return the latest prediction.
+    Return the prediction for a specific engine_id
+    if provided, otherwise the most recently
+    processed engine's prediction.
     """
 
-    return LATEST_PREDICTION
+    if engine_id is not None:
+        return PREDICTIONS_BY_ENGINE.get(engine_id, {})
 
+    if LATEST_ENGINE_ID is None:
+        return {}
 
+    return PREDICTIONS_BY_ENGINE.get(LATEST_ENGINE_ID, {})
 
 
 

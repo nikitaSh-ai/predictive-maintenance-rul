@@ -364,20 +364,7 @@ def run_prediction_v2(csv_path: str) -> dict:
 
     if extension == ".csv":
 
-        column_names = [
-        "engine_id",
-        "cycle",
-        "op_setting_1",
-        "op_setting_2",
-        "op_setting_3",
-        *[f"sensor_{i}" for i in range(1, 22)],
-    ]
-
-        df = pd.read_csv(
-        csv_path,
-        header=None,
-        names=column_names,
-    )
+        df = pd.read_csv(csv_path)
 
     elif extension == ".txt":
 
@@ -396,6 +383,7 @@ def run_prediction_v2(csv_path: str) -> dict:
             header=None,
             names=column_names,
         )
+        
 
     else:
         raise ValueError(

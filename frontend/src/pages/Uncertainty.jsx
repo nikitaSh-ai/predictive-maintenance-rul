@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 
 import { getUncertainty } from "../services/api";
 
@@ -8,9 +8,17 @@ import ErrorCard from "../components/common/ErrorCard";
 
 import { useLocation } from "react-router-dom";
 
+import { PredictionContext } from "../context/PredictionContext";
+
+import NoPredictionCard from "../components/common/NoPredictionCard";
+
 function Uncertainty() {
 
-  const { state: prediction } = useLocation();
+  const { state: locationPrediction } = useLocation();
+
+  const { selectedEngine } = useContext(PredictionContext);
+
+  const prediction = locationPrediction || selectedEngine;
 
   const [uncertaintyData, setUncertaintyData] = useState(null);
 
@@ -27,8 +35,7 @@ function Uncertainty() {
 
         try {
 
-            const data = await getUncertainty();
-
+            const data = await getUncertainty(prediction?.engine_id);
 console.log("Uncertainty API Response:", data);
 
 setUncertaintyData(data);
@@ -54,7 +61,7 @@ setError(
 
     fetchUncertainty();
 
-}, []);
+}, [prediction]);
   
 if (loading) {
     return (
@@ -89,7 +96,7 @@ const predictionStability =
         ? "Moderate"
         : "Low";
 
-if (!prediction) return <h2>No prediction selected.</h2>;
+if (!prediction) return <NoPredictionCard icon="📈" />;
 return (
 
     <div className="p-8">

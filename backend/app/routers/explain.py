@@ -1,15 +1,11 @@
 from fastapi import APIRouter
-
 from backend.app.services.prediction_service import (
     get_latest_prediction,
 )
-
 router = APIRouter()
-
-
 @router.get("/explain")
-def explain():
-    prediction = get_latest_prediction()
+def explain(engine_id: int = None):
+    prediction = get_latest_prediction(engine_id)
 
     feature_importance = prediction.get(
         "feature_importance",

@@ -24,9 +24,6 @@ function PredictRUL() {
     selectedEngine,
     setSelectedEngine,
 
-    selectedFile,
-    setSelectedFile,
-
     modelVersion,
     setModelVersion
 
@@ -35,7 +32,7 @@ function PredictRUL() {
     
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    
+    const [selectedFile, setSelectedFile] = useState(null);
     const [success, setSuccess] = useState("");
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
@@ -109,7 +106,7 @@ const handleChooseDataset = () => {
 
 
 const handlePredict = async () => {
-
+   
     if (!selectedFile) {
 
         setError("Please select a CSV or TXT file.");
@@ -130,10 +127,20 @@ console.log(selectedFile instanceof File);
         : await predictRUL(selectedFile);
 
     
-    console.log(result.predictions[0]);
+    console.log(result);
 
+
+    if (modelVersion === "v1") {
+
+    setPredictionResults([result]);
+
+    setSelectedEngine(result);
+
+} else {
 
     setPredictionResults(result.predictions);
+
+}
 
 
     setSuccess(
@@ -267,7 +274,7 @@ setTimeout(() => {
     isLoading && <LoadingSpinner />
 }
   {
-    predictionResults.length > 0 && (
+    Array.isArray(predictionResults) && predictionResults.length > 0 && (
 
         <>
 <FleetSummary

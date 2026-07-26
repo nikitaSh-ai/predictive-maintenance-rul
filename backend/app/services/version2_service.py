@@ -12,7 +12,7 @@ from src.version2.uncertainty_estimation import (
     monte_carlo_prediction,
     enable_dropout
 )
-from pathlib import Path
+
 
 def load_version2_model():
     """
@@ -25,17 +25,13 @@ def load_version2_model():
 )
     
 
-    path = Path("models/version2/best_generalized_gru.pth").resolve()
-    print("Loading model from:")
-    print(path)
+    
     model.load_state_dict(
-    
-    torch.load(
-        "models/version2/best_generalized_gru.pth",
-        map_location="cpu"
+        torch.load(
+            "models/version2/best_generalized_gru.pth",
+            map_location="cpu"
+        )
     )
-    )
-    
     model.eval()
 
     return model

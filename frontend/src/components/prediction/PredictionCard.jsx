@@ -494,9 +494,10 @@ function PredictionCard({ prediction }) {
     <div className="flex flex-wrap gap-4">
 
         {/* Decision Intelligence */}
+        {/* Decision Intelligence */}
         <button
             onClick={() =>
-                navigate("/engine-analysis", {
+                navigate("/decision-intelligence", {
                     state: prediction,
                 })
             }

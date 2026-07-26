@@ -12,14 +12,7 @@ export function PredictionProvider({ children }) {
       return JSON.parse(localStorage.getItem("selectedEngine")) || null;
     });
 
-    const [selectedFile, setSelectedFile] = useState(() => {
-    return JSON.parse(localStorage.getItem("selectedFile")) || {
-        name: "",
-        size: 0,
-        type: ""
-    };
-});
-
+    
     const [modelVersion, setModelVersion] = useState(() => {
       return localStorage.getItem("modelVersion") || "v2";
     });
@@ -31,11 +24,7 @@ export function PredictionProvider({ children }) {
 
     setSelectedEngine(null);
 
-    setSelectedFile({
-        name: "",
-        size: 0,
-        type: ""
-    });
+    
 
     setModelVersion("v2");
 
@@ -43,7 +32,7 @@ export function PredictionProvider({ children }) {
 
     localStorage.removeItem("selectedEngine");
 
-    localStorage.removeItem("selectedFile");
+    
 
     localStorage.removeItem("modelVersion");
 
@@ -69,14 +58,7 @@ useEffect(() => {
 
 }, [selectedEngine]);
 
-useEffect(() => {
 
-    localStorage.setItem(
-        "selectedFile",
-        JSON.stringify(selectedFile)
-    );
-
-}, [selectedFile]);
 
 useEffect(() => {
 
@@ -96,9 +78,7 @@ useEffect(() => {
                 selectedEngine,
                 setSelectedEngine,
 
-                selectedFile,
-                setSelectedFile,
-
+                
                 modelVersion,
                 setModelVersion,
 
