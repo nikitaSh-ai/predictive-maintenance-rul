@@ -1,3 +1,4 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
 fastapi
 uvicorn
 python-multipart
@@ -7,7 +8,7 @@ pandas
 scikit-learn
 joblib
 
-torch
+torch 
 captum
 
 matplotlib
