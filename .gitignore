@@ -8,7 +8,7 @@ venv/
 env/
 
 # Trained models
-models/*.pth
+#models/*.pth
 
 # Jupyter
 .ipynb_checkpoints/
@@ -30,7 +30,7 @@ node_modules/
 frontend/node_modules/
 
 # Scaler
-models/*.pth
+#models/*.pth
 
 # Processed scaler
 DATA/processed/*.pkl
@@ -41,7 +41,7 @@ DATA/processed/*.pkl
 DATA/version2/sequences/
 
 # Trained models (if you don't want to version them)
-models/version2/
+#models/version2/
 
 # Generated results
 results/version2/
