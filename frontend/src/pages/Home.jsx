@@ -83,7 +83,7 @@ lg:grid-cols-4 gap-6">
 
         <MetricCard
     title="Input Features"
-    value="17"
+    value="24"
 />
 
       </div>
