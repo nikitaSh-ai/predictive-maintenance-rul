@@ -19,7 +19,7 @@ export function PredictionProvider({ children }) {
         return null;
       }
     });
-
+                                                                              
     
     const [modelVersion, setModelVersion] = useState(() => {
       return localStorage.getItem("modelVersion") || "v2";
