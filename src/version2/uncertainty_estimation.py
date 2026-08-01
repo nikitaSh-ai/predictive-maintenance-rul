@@ -11,7 +11,6 @@ from src.version2.utils import load_model
 
 
 
-
 def load_sample():
     """
     Load one test sample.
@@ -50,43 +49,25 @@ def monte_carlo_prediction(
     sample,
     passes=50
 ):
-    """
-    Monte Carlo Dropout prediction.
-    """
-
     enable_dropout(model)
 
     predictions = []
 
     for _ in range(passes):
-      prediction = model(sample)
-      predictions.append(prediction.item())
+        prediction = model(sample)
+        predictions.append(prediction.item())
 
-        
+    predictions = np.array(predictions)
 
-    predictions = np.array(
-        predictions
-    )
+    mean_prediction = np.mean(predictions)
 
-    mean_prediction = np.mean(
-        predictions
-    )
-
-    std_prediction = np.std(
-        predictions
-    )
+    std_prediction = np.std(predictions)
 
     return (
         mean_prediction,
         std_prediction,
         predictions
     )
-
-
-
-
-
-
 
 
 def plot_prediction_distribution(

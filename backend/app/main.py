@@ -59,4 +59,6 @@ def root():
 
         "message": "Predictive Maintenance API is running."
 
-    }
+    }                    
+
+
