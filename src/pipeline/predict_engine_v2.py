@@ -531,7 +531,7 @@ def run_prediction_v2(csv_path: str) -> dict:
             f"{decision['recommendation']}"
         ),
 
-        "feature_importance": feature_importance,
+        #"feature_importance": feature_importance,
 
         "uncertainty": uncertainty_std,
 
