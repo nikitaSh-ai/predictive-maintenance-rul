@@ -454,12 +454,18 @@ def run_prediction_v2(csv_path: str) -> dict:
 
 
         # Generate Integrated Gradients feature importance
-        feature_importance = generate_attributions(
-        MODEL,
-        processed_sequence
-    )
+    #     feature_importance = generate_attributions(
+    #     MODEL,
+    #     processed_sequence
+    # )
 
-        logger.info("Feature importance generated successfully.")
+    #     logger.info("Feature importance generated successfully.")
+
+
+
+
+        # Skip Integrated Gradients for fleet prediction
+        feature_importance = []
 
     
 
