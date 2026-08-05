@@ -106,76 +106,72 @@ const handleChooseDataset = () => {
 
 
 const handlePredict = async () => {
-   
+    
+
     if (!selectedFile) {
-
+        
         setError("Please select a CSV or TXT file.");
-
         return;
-
     }
 
-    setError("");
+    
 
+    setError("");
     setIsLoading(true);
+
     try {
-console.log(selectedFile);
-console.log(selectedFile instanceof File);
+    
+
     const result =
-    modelVersion === "v2"
-        ? await predictRULV2(selectedFile)
-        : await predictRUL(selectedFile);
+        modelVersion === "v2"
+            ? await predictRULV2(selectedFile)
+            : await predictRUL(selectedFile);
 
     
-    console.log(result);
-
 
     if (modelVersion === "v1") {
 
-    setPredictionResults([result]);
+        setPredictionResults([result]);
+        setSelectedEngine(result);
 
-    setSelectedEngine(result);
+    } else {
 
-} else {
+        setPredictionResults(result.predictions);
 
-    setPredictionResults(result.predictions);
-
-}
-
+        // Optional: select first engine automatically
+        if (result.predictions.length > 0) {
+            setSelectedEngine(result.predictions[0]);
+        }
+    }
 
     setSuccess(
-    `Prediction completed successfully using ${
-        modelVersion === "v2"
-            ? "Version 2 (Generalized Model)"
-            : "Version 1 (FD001 Model)"
-    }.`
-);
-setTimeout(() => {
+        `Prediction completed successfully using ${
+            modelVersion === "v2"
+                ? "Version 2 (Generalized Model)"
+                : "Version 1 (FD001 Model)"
+        }.`
+    );
 
-    setSuccess("");
+    setTimeout(() => {
+        setSuccess("");
+    }, 3000);
 
-}, 3000);
+} catch (error) {
 
-}
-    catch (error) {
-
-      setError(
+    
+    setError(
         error.message ||
         "Prediction failed."
-      );
+    );
 
-    }
+} finally {
 
     
-    
-    finally {
 
-      setIsLoading(false);
+    setIsLoading(false);
 
-    }
+}
 };
-
-
 
     return (
 

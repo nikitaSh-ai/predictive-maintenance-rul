@@ -4,7 +4,7 @@ from captum.attr import IntegratedGradients
 
 from backend.app.services.model_service import model
 
-
+IG = IntegratedGradients(model)
 
 FEATURE_NAMES = [
 
@@ -42,15 +42,15 @@ def generate_attributions(input_tensor):
 
     model.eval()
 
-    ig = IntegratedGradients(model)
+    
 
     baseline = torch.zeros_like(input_tensor)
 
-    attributions = ig.attribute(
-        input_tensor,
-        baselines=baseline
-    )
-
+    attributions = IG.attribute(
+    input_tensor,
+    baselines=baseline,
+    n_steps=20
+)
     feature_importance = attributions.abs().mean(dim=1).squeeze(0)
 
 

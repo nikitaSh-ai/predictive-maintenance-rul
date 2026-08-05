@@ -79,7 +79,7 @@ def predict_with_uncertainty(
     mean_prediction, uncertainty, samples = monte_carlo_prediction(
         MODEL,
         tensor,
-        passes=50
+        passes=20
     )
 
     

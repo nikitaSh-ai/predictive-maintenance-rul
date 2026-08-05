@@ -1,10 +1,13 @@
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 import sys
 import logging
 from pathlib import Path
 from backend.app.routers import version2
 from backend.app.database.database import initialize_database
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2].parent
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+FRONTEND_DIST = PROJECT_ROOT / "frontend" / "dist"
 sys.path.append(str(PROJECT_ROOT))
 
 
@@ -52,13 +55,24 @@ app.include_router(
     version2.router
 )
 
+if FRONTEND_DIST.exists():
+    app.mount(
+        "/assets",
+        StaticFiles(directory=FRONTEND_DIST / "assets"),
+        name="assets",
+    )
+
 @app.get("/")
-def root():
-
-    return {
-
-        "message": "Predictive Maintenance API is running."
-
-    }                    
+def serve_frontend():
+    return FileResponse(FRONTEND_DIST / "index.html")
 
 
+
+@app.get("/{full_path:path}")
+def catch_all(full_path: str):
+    file_path = FRONTEND_DIST / full_path
+
+    if file_path.exists() and file_path.is_file():
+        return FileResponse(file_path)
+
+    return FileResponse(FRONTEND_DIST / "index.html")
